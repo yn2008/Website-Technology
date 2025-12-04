@@ -1,0 +1,1893 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tentang | ARIF Galaxy Web3</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg1: #0a0a2a; 
+      --bg2: #1a1a4a; 
+      --neon: #00f3ff; 
+      --purple: #9d00ff; 
+      --text: #fff;
+      --max-w: 1600px; 
+      --pad: 5%; 
+      --gap: 4rem;
+      --card-bg: rgba(26, 26, 74, 0.6);
+      --card-border: rgba(0, 243, 255, 0.2);
+      --success: #00ff88; 
+      --error: #ff4444; 
+      --warning: #ffaa00;
+    }
+    
+    *, *::before, *::after { 
+      margin:0; 
+      padding:0; 
+      box-sizing:border-box; 
+    }
+    
+    html { 
+      scroll-behavior: smooth; 
+    }
+    
+    body { 
+      background: linear-gradient(135deg, var(--bg1), var(--bg2)); 
+      color: var(--text); 
+      font-family: 'Orbitron', sans-serif; 
+      min-height: 100vh; 
+      overflow-x: hidden; 
+    }
+    
+    canvas { 
+      position: fixed; 
+      top:0; 
+      left:0; 
+      width:100%; 
+      height:100%; 
+      z-index:-1; 
+      pointer-events:none; 
+    }
+
+    /* Offline indicator */
+    .offline-indicator {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: var(--warning);
+      color: var(--bg1);
+      text-align: center;
+      padding: 0.5rem;
+      z-index: 10001;
+      font-weight: bold;
+      transform: translateY(-100%);
+      transition: transform 0.3s ease;
+    }
+    
+    .offline-indicator.show {
+      transform: translateY(0);
+    }
+
+    /* Header & Navigation */
+    header {
+      position: fixed; 
+      top:0; 
+      left:0; 
+      width:100%; 
+      z-index:1000;
+      background: rgba(10,10,42,0.85); 
+      backdrop-filter: blur(12px);
+      padding: clamp(0.8rem, 2vw, 1.5rem) var(--pad);
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      transition: all 0.4s ease;
+    }
+    
+    header.scrolled { 
+      background: rgba(10,10,42,0.95); 
+      padding: 0.6rem var(--pad); 
+    }
+    
+    .logo { 
+      font-size: clamp(1.4rem, 4vw, 2.2rem); 
+      font-weight: 900; 
+      color: var(--neon); 
+      text-shadow: 0 0 12px var(--neon); 
+      transition: all 0.3s; 
+    }
+    
+    header.scrolled .logo { 
+      font-size: clamp(1.2rem, 3vw, 1.8rem); 
+    }
+    
+    nav ul { 
+      display: flex; 
+      gap: clamp(1.5rem, 2.5vw, 3rem); 
+      list-style: none; 
+    }
+    
+    nav a { 
+      color: var(--text); 
+      text-decoration: none; 
+      font-weight: 600; 
+      font-size: clamp(0.85rem, 2vw, 1.1rem); 
+      position: relative; 
+      padding: 0.5rem 0; 
+      transition: color 0.3s; 
+    }
+    
+    nav a::after { 
+      content: ''; 
+      position: absolute; 
+      bottom: -6px; 
+      left: 0; 
+      width: 0; 
+      height: 3px; 
+      background: var(--neon); 
+      border-radius: 2px; 
+      transition: width 0.4s; 
+    }
+    
+    nav a:hover::after, 
+    nav a.active::after { 
+      width: 100%; 
+    }
+    
+    nav a:hover, 
+    nav a.active { 
+      color: var(--neon); 
+      text-shadow: 0 0 10px var(--neon); 
+    }
+    
+    .mobile-menu-btn { 
+      display: none; 
+      background: none; 
+      border: none; 
+      color: var(--neon); 
+      font-size: 1.5rem; 
+      cursor: pointer; 
+    }
+
+    /* Hero Section */
+    .hero { 
+      min-height: 100vh; 
+      display: flex; 
+      align-items: center; 
+      padding: clamp(100px, 10vh, 140px) var(--pad) 5rem; 
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .hero-grid { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: var(--gap); 
+      align-items: center; 
+      max-width: var(--max-w); 
+      margin: 0 auto; 
+      width: 100%; 
+    }
+    
+    .hero-text h1 { 
+      font-size: clamp(2.2rem, 6vw, 5rem); 
+      line-height: 1.1; 
+      margin-bottom: 1.5rem; 
+      background: linear-gradient(90deg, var(--neon), var(--purple)); 
+      -webkit-background-clip: text; 
+      -webkit-text-fill-color: transparent; 
+      animation: glow 2s ease-in-out infinite alternate; 
+    }
+    
+    .hero-text p { 
+      font-size: clamp(0.95rem, 2.2vw, 1.4rem); 
+      margin: 1.5rem 0 2rem; 
+      opacity: 0.9; 
+      line-height: 1.7; 
+    }
+    
+    .btn { 
+      display: inline-block; 
+      padding: clamp(12px, 2vw, 16px) clamp(28px, 4vw, 40px); 
+      background: transparent; 
+      color: var(--neon); 
+      border: 2px solid var(--neon); 
+      border-radius: 50px; 
+      font-weight: bold; 
+      text-decoration: none; 
+      font-size: clamp(0.9rem, 2vw, 1.1rem); 
+      transition: all 0.5s; 
+      box-shadow: 0 0 20px rgba(0,243,255,0.3); 
+      position: relative; 
+      overflow: hidden; 
+      cursor: pointer;
+    }
+    
+    .btn::before { 
+      content: ''; 
+      position: absolute; 
+      top:0; 
+      left:-100%; 
+      width:100%; 
+      height:100%; 
+      background: linear-gradient(90deg, transparent, rgba(0,243,255,0.2)); 
+      transition: left 0.7s; 
+    }
+    
+    .btn:hover::before { 
+      left: 100%; 
+    }
+    
+    .btn:hover { 
+      background: rgba(0,243,255,0.15); 
+      box-shadow: 0 0 30px var(--neon); 
+      transform: translateY(-3px); 
+    }
+
+    .hero-img { 
+      border-radius: 20px; 
+      overflow: hidden; 
+      box-shadow: 0 0 40px rgba(0,243,255,0.4); 
+      transform: perspective(1000px) rotateY(5deg); 
+      transition: transform 0.6s; 
+      position: relative;
+    }
+    
+    .hero-img::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, rgba(0,243,255,0.1), rgba(157,0,255,0.1));
+      z-index: 1;
+    }
+    
+    .hero-img:hover { 
+      transform: perspective(1000px) rotateY(0) scale(1.03); 
+    }
+    
+    .hero-img img { 
+      width:100%; 
+      height:auto; 
+      display:block; 
+      object-fit:cover; 
+      transition: transform 0.6s;
+    }
+    
+    .hero-img:hover img {
+      transform: scale(1.05);
+    }
+
+    /* About Section Styles */
+    .about-section { 
+      padding: clamp(4rem, 8vw, 8rem) var(--pad); 
+      max-width: var(--max-w); 
+      margin: 0 auto; 
+    }
+    
+    .section-title { 
+      text-align: center; 
+      font-size: clamp(2rem, 5vw, 3.5rem); 
+      margin-bottom: clamp(2rem, 5vw, 4rem); 
+      background: linear-gradient(90deg, var(--neon), var(--purple)); 
+      -webkit-background-clip: text; 
+      -webkit-text-fill-color: transparent; 
+      position: relative; 
+    }
+    
+    .section-title::after { 
+      content: ''; 
+      position: absolute; 
+      bottom: -10px; 
+      left: 50%; 
+      transform: translateX(-50%); 
+      width: 80px; 
+      height: 4px; 
+      background: var(--neon); 
+      border-radius: 2px; 
+    }
+    
+    .about-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+      gap: clamp(2rem, 4vw, 3rem); 
+      margin-bottom: clamp(3rem, 6vw, 5rem); 
+    }
+    
+    .about-card { 
+      background: var(--card-bg); 
+      border-radius: 20px; 
+      padding: clamp(1.5rem, 3vw, 2.5rem); 
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); 
+      border: 1px solid var(--card-border); 
+      transition: all 0.4s; 
+      position: relative; 
+      overflow: hidden; 
+    }
+    
+    .about-card::before { 
+      content: ''; 
+      position: absolute; 
+      top: 0; 
+      left: -100%; 
+      width: 100%; 
+      height: 100%; 
+      background: linear-gradient(90deg, transparent, rgba(0,243,255,0.1)); 
+      transition: left 0.6s; 
+    }
+    
+    .about-card:hover::before { 
+      left: 100%; 
+    }
+    
+    .about-card:hover { 
+      transform: translateY(-10px); 
+      box-shadow: 0 15px 40px rgba(0, 243, 255, 0.2); 
+    }
+    
+    .card-icon { 
+      font-size: clamp(2.5rem, 5vw, 3.5rem); 
+      margin-bottom: 1.5rem; 
+      color: var(--neon); 
+      text-shadow: 0 0 15px var(--neon); 
+      transition: transform 0.4s; 
+    }
+    
+    .about-card:hover .card-icon { 
+      transform: scale(1.2) rotate(5deg); 
+    }
+    
+    .card-title { 
+      font-size: clamp(1.4rem, 3vw, 1.8rem); 
+      margin-bottom: 1rem; 
+      color: var(--neon); 
+    }
+    
+    .card-text { 
+      font-size: clamp(0.9rem, 1.8vw, 1.1rem); 
+      line-height: 1.7; 
+      opacity: 0.9; 
+    }
+    
+    /* IMPROVED: Timeline Section - Responsif & Interaktif */
+    .timeline-section { 
+      margin-bottom: clamp(3rem, 6vw, 5rem); 
+    }
+    
+    .timeline-container { 
+      position: relative; 
+      max-width: 1200px; 
+      margin: 0 auto; 
+    }
+    
+    /* Garis timeline vertikal */
+    .timeline-container::after {
+      content: '';
+      position: absolute;
+      width: 4px;
+      background: var(--neon);
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      margin-left: -2px;
+      box-shadow: 0 0 15px var(--neon);
+    }
+    
+    .timeline-item {
+      padding: 10px 40px;
+      position: relative;
+      width: 50%;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.6s ease;
+    }
+    
+    .timeline-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    /* Item timeline kiri */
+    .timeline-item:nth-child(odd) {
+      left: 0;
+      text-align: right;
+    }
+    
+    /* Item timeline kanan */
+    .timeline-item:nth-child(even) {
+      left: 50%;
+    }
+    
+    /* Lingkaran timeline */
+    .timeline-item::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: var(--neon);
+      border: 4px solid var(--bg1);
+      border-radius: 50%;
+      top: 20px;
+      z-index: 1;
+      box-shadow: 0 0 15px var(--neon);
+    }
+    
+    .timeline-item:nth-child(odd)::after {
+      right: -10px;
+    }
+    
+    .timeline-item:nth-child(even)::after {
+      left: -10px;
+    }
+    
+    .timeline-content {
+      padding: 20px 25px;
+      background: var(--card-bg);
+      border-radius: 15px;
+      border: 1px solid var(--card-border);
+      position: relative;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .timeline-content:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 243, 255, 0.3);
+    }
+    
+    .timeline-year {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--neon);
+      margin-bottom: 8px;
+      text-shadow: 0 0 10px var(--neon);
+    }
+    
+    .timeline-title {
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+    
+    .timeline-desc {
+      font-size: 0.95rem;
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+    
+    /* Timeline details expanded */
+    .timeline-details {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease;
+      margin-top: 10px;
+    }
+    
+    .timeline-details.expanded {
+      max-height: 300px;
+    }
+    
+    .timeline-content.expanded {
+      transform: scale(1.02);
+      box-shadow: 0 10px 30px rgba(0, 243, 255, 0.4);
+    }
+    
+    .timeline-details ul {
+      padding-left: 20px;
+      margin-top: 10px;
+    }
+    
+    .timeline-details li {
+      margin-bottom: 8px;
+      opacity: 0.9;
+    }
+    
+    /* IMPROVED: Focus Areas Section - Mobile Optimized */
+    .focus-section { 
+      margin-bottom: clamp(3rem, 6vw, 5rem); 
+    }
+    
+    .focus-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+      gap: clamp(1.5rem, 3vw, 2rem); 
+    }
+    
+    .focus-card { 
+      background: var(--card-bg); 
+      border-radius: 15px; 
+      padding: clamp(1.5rem, 3vw, 2rem); 
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3); 
+      border: 1px solid var(--card-border); 
+      transition: all 0.3s; 
+      position: relative; 
+      overflow: hidden; 
+      text-align: center;
+      cursor: pointer;
+    }
+    
+    .focus-card::before { 
+      content: ''; 
+      position: absolute; 
+      top: 0; 
+      left: -100%; 
+      width: 100%; 
+      height: 100%; 
+      background: linear-gradient(90deg, transparent, rgba(0,243,255,0.1)); 
+      transition: left 0.5s; 
+    }
+    
+    .focus-card:hover::before { 
+      left: 100%; 
+    }
+    
+    .focus-card:hover { 
+      transform: translateY(-5px); 
+      box-shadow: 0 12px 30px rgba(0, 243, 255, 0.2); 
+    }
+    
+    .focus-icon { 
+      font-size: clamp(2rem, 4vw, 2.5rem); 
+      margin-bottom: 1rem; 
+      color: var(--neon); 
+      text-shadow: 0 0 10px var(--neon); 
+      transition: transform 0.4s; 
+    }
+    
+    .focus-card:hover .focus-icon { 
+      transform: scale(1.2); 
+    }
+    
+    .focus-title { 
+      font-size: clamp(1.2rem, 2.5vw, 1.5rem); 
+      margin-bottom: 0.8rem; 
+      color: var(--neon); 
+    }
+    
+    .focus-desc { 
+      font-size: clamp(0.85rem, 1.6vw, 0.95rem); 
+      line-height: 1.6; 
+      opacity: 0.9; 
+    }
+    
+    /* Single Team Section */
+    .team-section { 
+      margin-bottom: clamp(3rem, 6vw, 5rem); 
+      text-align: center; 
+    }
+    
+    .team-card { 
+      max-width: 700px; 
+      margin: 0 auto; 
+      background: var(--card-bg); 
+      border-radius: 20px; 
+      padding: clamp(2rem, 4vw, 3rem); 
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); 
+      border: 1px solid var(--card-border); 
+      transition: all 0.4s; 
+      position: relative; 
+      overflow: hidden; 
+    }
+    
+    .team-card::before { 
+      content: ''; 
+      position: absolute; 
+      top: 0; 
+      left: -100%; 
+      width: 100%; 
+      height: 100%; 
+      background: linear-gradient(90deg, transparent, rgba(0,243,255,0.1)); 
+      transition: left 0.6s; 
+    }
+    
+    .team-card:hover::before { 
+      left: 100%; 
+    }
+    
+    .team-card:hover { 
+      transform: translateY(-5px); 
+      box-shadow: 0 15px 40px rgba(0, 243, 255, 0.2); 
+    }
+    
+    .team-img { 
+      width: 180px; 
+      height: 180px; 
+      border-radius: 50%; 
+      margin: 0 auto 2rem; 
+      overflow: hidden; 
+      border: 3px solid var(--neon); 
+      box-shadow: 0 0 25px rgba(0, 243, 255, 0.5); 
+      position: relative; 
+      transition: all 0.4s; 
+    }
+    
+    .team-card:hover .team-img { 
+      transform: scale(1.05); 
+      box-shadow: 0 0 35px rgba(0, 243, 255, 0.7); 
+    }
+    
+    .team-img img { 
+      width: 100%; 
+      height: 100%; 
+      object-fit: cover; 
+      transition: transform 0.6s; 
+    }
+    
+    .team-card:hover .team-img img { 
+      transform: scale(1.1); 
+    }
+    
+    .team-name { 
+      font-size: clamp(1.5rem, 3vw, 2rem); 
+      margin-bottom: 0.5rem; 
+      color: var(--neon); 
+    }
+    
+    .team-role { 
+      font-size: clamp(1rem, 2vw, 1.2rem); 
+      margin-bottom: 1.5rem; 
+      opacity: 0.8; 
+    }
+    
+    .team-desc { 
+      font-size: clamp(0.9rem, 1.8vw, 1.1rem); 
+      line-height: 1.7; 
+      margin-bottom: 2rem; 
+      opacity: 0.9; 
+    }
+    
+    .skills-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
+      gap: 1rem; 
+      margin-top: 1.5rem; 
+    }
+    
+    .skill-item { 
+      background: rgba(0, 243, 255, 0.1); 
+      border-radius: 10px; 
+      padding: 0.8rem; 
+      border: 1px solid rgba(0, 243, 255, 0.3); 
+      transition: all 0.3s; 
+    }
+    
+    .skill-item:hover { 
+      background: rgba(0, 243, 255, 0.2); 
+      transform: translateY(-3px); 
+    }
+    
+    .skill-name { 
+      font-size: 0.9rem; 
+      color: var(--neon); 
+      margin-bottom: 0.3rem; 
+    }
+    
+    .skill-level { 
+      height: 6px; 
+      background: rgba(255,255,255,0.2); 
+      border-radius: 3px; 
+      overflow: hidden; 
+    }
+    
+    .skill-progress { 
+      height: 100%; 
+      background: var(--neon); 
+      border-radius: 3px; 
+      width: 0; 
+      transition: width 1.5s ease-in-out; 
+    }
+    
+    /* NEW: Achievements Section */
+    .achievements-section {
+      margin-bottom: clamp(3rem, 6vw, 5rem);
+    }
+    
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: clamp(1.5rem, 3vw, 2rem);
+    }
+    
+    .achievement-card {
+      background: var(--card-bg);
+      border-radius: 15px;
+      padding: clamp(1.5rem, 3vw, 2rem);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--card-border);
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+    
+    .achievement-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,243,255,0.1));
+      transition: left 0.5s;
+    }
+    
+    .achievement-card:hover::before {
+      left: 100%;
+    }
+    
+    .achievement-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0, 243, 255, 0.2);
+    }
+    
+    .achievement-icon {
+      font-size: clamp(2rem, 4vw, 2.5rem);
+      margin-bottom: 1rem;
+      color: var(--neon);
+      text-shadow: 0 0 10px var(--neon);
+    }
+    
+    .achievement-title {
+      font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+      margin-bottom: 0.8rem;
+      color: var(--neon);
+    }
+    
+    .achievement-desc {
+      font-size: clamp(0.85rem, 1.6vw, 0.95rem);
+      line-height: 1.6;
+      opacity: 0.9;
+    }
+    
+    /* NEW: Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal.active {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: clamp(1.5rem, 3vw, 2.5rem);
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+      border: 2px solid var(--neon);
+      box-shadow: 0 0 40px rgba(0, 243, 255, 0.5);
+    }
+    
+    .modal-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: none;
+      border: none;
+      color: var(--neon);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .modal-close:hover {
+      transform: scale(1.2);
+      text-shadow: 0 0 10px var(--neon);
+    }
+    
+    .modal-title {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      margin-bottom: 1rem;
+      color: var(--neon);
+      text-align: center;
+    }
+    
+    .modal-desc {
+      font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+      line-height: 1.7;
+      opacity: 0.9;
+      margin-bottom: 1.5rem;
+    }
+    
+    .modal-tech-list {
+      list-style: none;
+      margin-top: 1rem;
+    }
+    
+    .modal-tech-list li {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+      display: flex;
+      align-items: center;
+    }
+    
+    .modal-tech-list li:last-child {
+      border-bottom: none;
+    }
+    
+    .modal-tech-list i {
+      color: var(--neon);
+      margin-right: 10px;
+    }
+    
+    /* CTA Section */
+    .cta-section { 
+      text-align: center; 
+      padding: clamp(3rem, 6vw, 5rem); 
+      background: rgba(26, 26, 74, 0.4); 
+      border-radius: 20px; 
+      margin-bottom: clamp(3rem, 6vw, 5rem); 
+      border: 1px solid rgba(0, 243, 255, 0.2); 
+      position: relative; 
+      overflow: hidden; 
+    }
+    
+    .cta-section::before { 
+      content: ''; 
+      position: absolute; 
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 100%; 
+      background: linear-gradient(45deg, rgba(0,243,255,0.05), rgba(157,0,255,0.05)); 
+      z-index: -1; 
+    }
+    
+    .cta-title { 
+      font-size: clamp(1.8rem, 4vw, 2.8rem); 
+      margin-bottom: 1.5rem; 
+      color: var(--neon); 
+    }
+    
+    .cta-text { 
+      font-size: clamp(0.95rem, 2vw, 1.2rem); 
+      margin-bottom: 2rem; 
+      max-width: 700px; 
+      margin-left: auto; 
+      margin-right: auto; 
+      line-height: 1.7; 
+      opacity: 0.9; 
+    }
+    
+    footer { 
+      text-align: center; 
+      padding: clamp(2rem, 3vw, 3rem) var(--pad); 
+      background: rgba(0,0,0,0.4); 
+      font-size: clamp(0.85rem, 1.5vw, 1rem); 
+      color: #ccc; 
+      backdrop-filter: blur(5px); 
+      position: relative;
+    }
+    
+    footer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to top, rgba(0,243,255,0.05), transparent);
+    }
+
+    /* Scroll to Top Button */
+    .scroll-to-top {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      background: var(--neon);
+      color: var(--bg1);
+      border: none;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0,243,255,0.5);
+      transition: all 0.3s;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+    }
+    
+    .scroll-to-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .scroll-to-top:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 25px var(--neon);
+    }
+
+    /* Loading Animation */
+    .loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s, visibility 0.5s;
+    }
+    
+    .loading.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+    
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 5px solid rgba(0,243,255,0.3);
+      border-top: 5px solid var(--neon);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    /* Menu Card Styles untuk Mobile */
+    .mobile-menu-cards {
+      display: none;
+      position: fixed;
+      top: 70px;
+      right: 15px;
+      width: 150px;
+      background: rgba(10, 10, 42, 0.95);
+      backdrop-filter: blur(15px);
+      border: 1px solid var(--neon);
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0, 243, 255, 0.2);
+      z-index: 999;
+      padding: 0.8rem;
+      animation: slideDown 0.3s ease-out;
+    }
+    
+    @keyframes slideDown {
+      from { 
+        opacity: 0;
+        transform: translateY(-20px); 
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0); 
+      }
+    }
+    
+    .mobile-menu-cards.active {
+      display: block;
+    }
+    
+    .menu-cards-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .menu-card {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.7rem 0.5rem;
+      border-radius: 8px;
+      background: transparent;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--text);
+    }
+    
+    .menu-card:hover, .menu-card.active {
+      background: rgba(0, 243, 255, 0.1);
+    }
+    
+    .menu-card i {
+      font-size: 1rem;
+      width: 20px;
+      text-align: center;
+      color: var(--neon);
+      transition: all 0.3s ease;
+    }
+    
+    .menu-card.active i, .menu-card:hover i {
+      transform: scale(1.2);
+      text-shadow: 0 0 8px var(--neon);
+    }
+    
+    .menu-card span {
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .menu-card.active span, .menu-card:hover span {
+      color: var(--neon);
+    }
+    
+    /* Plus Button di Kanan Atas untuk Mobile */
+    .mobile-plus-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--neon);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .mobile-plus-btn.active {
+      transform: rotate(45deg);
+      background: rgba(0, 243, 255, 0.1);
+    }
+    
+    /* Enhanced Card Animation untuk Mobile */
+    .mobile-card-hover {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .mobile-card-hover::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,243,255,0.1), transparent);
+      transition: left 0.6s;
+    }
+    
+    .mobile-card-hover:hover::before {
+      left: 100%;
+    }
+    
+    /* Animations */
+    @keyframes glow { 
+      from { 
+        text-shadow: 0 0 20px var(--neon); 
+      } 
+      to { 
+        text-shadow: 0 0 30px var(--neon), 0 0 40px var(--purple); 
+      } 
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fade-in { animation: fadeInUp 0.8s ease-out; }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      /* Sembunyikan menu desktop dan hamburger */
+      nav {
+        display: none;
+      }
+      
+      .mobile-menu-btn {
+        display: none;
+      }
+      
+      /* Tampilkan tombol plus di kanan atas */
+      .mobile-plus-btn {
+        display: flex;
+      }
+      
+      .hero-grid { 
+        grid-template-columns: 1fr; 
+        text-align: center; 
+        gap: 2rem; 
+      } 
+      
+      .hero-text { 
+        order: 2; 
+      } 
+      
+      .hero-img { 
+        order: 1; 
+        max-width: 85%; 
+        margin: 0 auto; 
+      }
+      
+      /* IMPROVED: Timeline Mobile Responsive */
+      .timeline-container::after {
+        left: 31px;
+      }
+      
+      .timeline-item {
+        width: 100%;
+        padding-left: 70px;
+        padding-right: 25px;
+        text-align: left;
+      }
+      
+      .timeline-item:nth-child(even) {
+        left: 0;
+      }
+      
+      .timeline-item::after {
+        left: 21px;
+      }
+      
+      .timeline-item:nth-child(odd)::after {
+        right: auto;
+        left: 21px;
+      }
+      
+      .focus-grid { 
+        grid-template-columns: 1fr; 
+        gap: 1.5rem; 
+      }
+      
+      .achievements-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      
+      .skills-grid { grid-template-columns: repeat(2, 1fr); }
+      
+      .scroll-to-top {
+        bottom: 80px;
+        right: 20px;
+        width: 45px;
+        height: 45px;
+        font-size: 1rem;
+      }
+      
+      /* Menu Cards untuk Mobile */
+      .mobile-menu-cards {
+        display: none;
+      }
+      
+      .mobile-menu-cards.active {
+        display: block;
+      }
+      
+      /* Adjust footer padding untuk mobile dengan menu cards */
+      footer {
+        padding-bottom: clamp(2rem, 3vw, 3rem);
+      }
+    }
+    
+    @media (min-width: 577px) and (max-width: 768px) { 
+      .hero-grid { 
+        grid-template-columns: 1fr; 
+        text-align: center; 
+      } 
+      .hero-img { 
+        max-width: 70%; 
+        margin: 0 auto; 
+      } 
+    } 
+    
+    @media (min-width: 769px) and (max-width: 992px) { 
+      .hero-grid { 
+        grid-template-columns: 1fr 1.2fr; 
+        gap: 2.5rem; 
+      } 
+    } 
+    
+    @media (min-width: 1601px) { 
+      --gap: 6rem; 
+      --pad: 8%; 
+      .hero-text h1 { 
+        font-size: 6rem; 
+      } 
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Offline Indicator -->
+  <div class="offline-indicator" id="offlineIndicator">
+    <i class="fas fa-wifi"></i> Anda sedang offline. Beberapa fitur mungkin tidak tersedia.
+  </div>
+
+  <canvas id="galaxy"></canvas>
+
+  <!-- Header -->
+  <header id="navbar">
+    <div class="logo">ARIF</div>
+    
+    <!-- Tombol Plus untuk Mobile -->
+    <button class="mobile-plus-btn" id="mobilePlusBtn">
+      <i class="fas fa-plus"></i>
+    </button>
+    
+    <!-- Navigasi Desktop -->
+    <nav id="mainNav">
+      <ul>
+        <li><a href="index.html" data-page="beranda">Beranda</a></li>
+        <li><a href="berita.html" data-page="berita">Berita</a></li>
+        <li><a href="tentang.html" data-page="tentang" class="active">Tentang</a></li>
+        <li><a href="kontak.html" data-page="kontak">Kontak</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-grid">
+      <div class="hero-text fade-in">
+        <h1>Tentang Kami</h1>
+        <p>Menjelajahi batas teknologi Web3, AI, dan TJKT untuk menciptakan masa depan digital yang terdesentralisasi dan berdaulat.</p>
+        <a href="#journey" class="btn">Jelajahi Perjalanan Kami</a>
+      </div>
+      <div class="hero-img fade-in">
+        <img 
+          src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80"
+          srcset="
+            https://images.unsplash.com/photo-1639762681485-074b7f938ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80 400w,
+            https://images.unsplash.com/photo-1639762681485-074b7f938ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80 800w,
+            https://images.unsplash.com/photo-1639762681485-074b7f938ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80 1200w"
+          sizes="(max-width: 576px) 85vw, (max-width: 992px) 70vw, 50vw"
+          alt="Tentang ARIF Galaxy Web3" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <!-- Visi & Misi Section -->
+  <section class="about-section" id="visi-misi">
+    <h2 class="section-title">Visi & Misi Kami</h2>
+    
+    <div class="about-grid">
+      <div class="about-card fade-in">
+        <div class="card-icon">🌌</div>
+        <h3 class="card-title">Visi</h3>
+        <p class="card-text">Menciptakan ekosistem Web3 yang terdesentralisasi, inklusif, dan berkelanjutan dengan menerapkan prinsip-prinsip TJKT untuk infrastruktur yang handal dan aman.</p>
+      </div>
+      
+      <div class="about-card fade-in">
+        <div class="card-icon">🚀</div>
+        <h3 class="card-title">Misi</h3>
+        <p class="card-text">Mengembangkan solusi teknologi blockchain, AI, dan jaringan komputer yang revolusioner berdasarkan kompetensi TJKT untuk memberdayakan komunitas global.</p>
+      </div>
+      
+      <div class="about-card fade-in">
+        <div class="card-icon">💡</div>
+        <h3 class="card-title">Nilai</h3>
+        <p class="card-text">Transparansi, inovasi, kolaborasi, dan desentralisasi adalah nilai inti yang memandu setiap langkah kami dalam membangun masa depan digital.</p>
+      </div>
+    </div>
+  </section>
+  
+  <!-- IMPROVED: Timeline Section - Perjalanan Teknologi Kami -->
+  <section class="about-section" id="journey">
+    <h2 class="section-title">Perjalanan Teknologi Kami</h2>
+    
+    <div class="timeline-section">
+      <div class="timeline-container">
+        <div class="timeline-item">
+          <div class="timeline-content">
+            <div class="timeline-year">2022</div>
+            <h3 class="timeline-title">Awal Perjalanan</h3>
+            <p class="timeline-desc">Dimulai dengan penelitian mendalam tentang teknologi blockchain dan jaringan komputer. Fokus pada pengembangan konsep dasar Web3 dan sistem terdistribusi.</p>
+            <div class="timeline-details">
+              <ul>
+                <li>Penelitian fundamental tentang teknologi blockchain</li>
+                <li>Studi jaringan peer-to-peer dan sistem terdistribusi</li>
+                <li>Pengembangan protokol komunikasi dasar</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        <div class="timeline-item">
+          <div class="timeline-content">
+            <div class="timeline-year">2023</div>
+            <h3 class="timeline-title">Pengembangan Prototype</h3>
+            <p class="timeline-desc">Membangun prototype pertama untuk sistem blockchain sederhana. Eksperimen dengan smart contracts dan integrasi IoT dasar.</p>
+            <div class="timeline-details">
+              <ul>
+                <li>Prototype blockchain dengan konsensus Proof-of-Work</li>
+                <li>Smart contract pertama untuk sistem voting</li>
+                <li>Integrasi sensor IoT dengan jaringan blockchain</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        <div class="timeline-item">
+          <div class="timeline-content">
+            <div class="timeline-year">2024</div>
+            <h3 class="timeline-title">Ekspansi Teknologi</h3>
+            <p class="timeline-desc">Mengintegrasikan AI dengan sistem blockchain. Pengembangan algoritma konsensus yang lebih efisien dan scalable network architecture.</p>
+            <div class="timeline-details">
+              <ul>
+                <li>Integrasi AI untuk analisis data blockchain</li>
+                <li>Algoritma konsensus Proof-of-Stake yang efisien</li>
+                <li>Arsitektur jaringan yang dapat diskalakan hingga 10.000 node</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        <div class="timeline-item">
+          <div class="timeline-content">
+            <div class="timeline-year">2025</div>
+            <h3 class="timeline-title">Revolusi Web3</h3>
+            <p class="timeline-desc">Peluncuran platform ARIF Galaxy Web3 dengan fitur lengkap. Implementasi teknologi terbaru dalam bidang TJKT untuk ekosistem yang lebih aman dan efisien.</p>
+            <div class="timeline-details">
+              <ul>
+                <li>Platform Web3 dengan dApps terintegrasi</li>
+                <li>Protokol keamanan mutakhir dengan enkripsi quantum-resistant</li>
+                <li>Integrasi penuh dengan ekosistem DeFi dan NFT</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- NEW: Achievements Section -->
+  <section class="about-section">
+    <h2 class="section-title">Pencapaian Kami</h2>
+    
+    <div class="achievements-section">
+      <div class="achievements-grid">
+        <div class="achievement-card fade-in">
+          <div class="achievement-icon">🏆</div>
+          <h3 class="achievement-title">Blockchain Scalability</h3>
+          <p class="achievement-desc">Mencapai throughput 10.000 TPS pada jaringan blockchain dengan latensi kurang dari 2 detik.</p>
+        </div>
+        
+        <div class="achievement-card fade-in">
+          <div class="achievement-icon">🔒</div>
+          <h3 class="achievement-title">Keamanan Terverifikasi</h3>
+          <p class="achievement-desc">Smart contract kami telah diaudit dan diverifikasi dengan zero critical vulnerabilities.</p>
+        </div>
+        
+        <div class="achievement-card fade-in">
+          <div class="achievement-icon">🌐</div>
+          <h3 class="achievement-title">Jaringan Global</h3>
+          <p class="achievement-desc">Membangun jaringan node di 15 negara dengan uptime 99.9% selama 12 bulan terakhir.</p>
+        </div>
+        
+        <div class="achievement-card fade-in">
+          <div class="achievement-icon">🤝</div>
+          <h3 class="achievement-title">Kolaborasi Industri</h3>
+          <p class="achievement-desc">Bekerja sama dengan 5 perusahaan teknologi terkemuka dalam pengembangan solusi Web3.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- IMPROVED: Focus Areas Section -->
+  <section class="about-section">
+    <h2 class="section-title">Area Fokus Teknologi</h2>
+    
+    <div class="focus-section">
+      <div class="focus-grid">
+        <div class="focus-card fade-in" data-modal="blockchain">
+          <div class="focus-icon">🔗</div>
+          <h3 class="focus-title">Jaringan Blockchain</h3>
+          <p class="focus-desc">Membangun infrastruktur jaringan peer-to-peer yang terdesentralisasi dengan performa tinggi dan keamanan optimal.</p>
+        </div>
+        
+        <div class="focus-card fade-in" data-modal="security">
+          <div class="focus-icon">🛡️</div>
+          <h3 class="focus-title">Keamanan Jaringan</h3>
+          <p class="focus-desc">Implementasi protokol keamanan mutakhir untuk melindungi sistem dari berbagai ancaman siber.</p>
+        </div>
+        
+        <div class="focus-card fade-in" data-modal="optimization">
+          <div class="focus-icon">⚡</div>
+          <h3 class="focus-title">Optimasi Kinerja</h3>
+          <p class="focus-desc">Tuning dan optimasi jaringan untuk meningkatkan throughput dan mengurangi latency sistem.</p>
+        </div>
+        
+        <div class="focus-card fade-in" data-modal="iot">
+          <div class="focus-icon">🌐</div>
+          <h3 class="focus-title">IoT & Web3</h3>
+          <p class="focus-desc">Integrasi perangkat IoT dengan ekosistem Web3 untuk aplikasi terdesentralisasi yang inovatif.</p>
+        </div>
+        
+        <div class="focus-card fade-in" data-modal="5g">
+          <div class="focus-icon">📡</div>
+          <h3 class="focus-title">Jaringan 5G & Web3</h3>
+          <p class="focus-desc">Pemanfaatan teknologi 5G untuk meningkatkan skalabilitas dan kecepatan transaksi Web3.</p>
+        </div>
+        
+        <div class="focus-card fade-in" data-modal="cryptography">
+          <div class="focus-icon">🔒</div>
+          <h3 class="focus-title">Kriptografi Jaringan</h3>
+          <p class="focus-desc">Penerapan algoritma kriptografi modern untuk mengamankan komunikasi dalam jaringan terdesentralisasi.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Team Section -->
+  <section class="about-section">
+    <h2 class="section-title">Sendiri</h2>
+    
+    <div class="team-section">
+      <div class="team-card fade-in">
+        <div class="team-img">
+          <img src="png/arif.png" alt="ARIF" loading="lazy">
+        </div>
+        <h3 class="team-name">ARIF</h3>
+        <p class="team-role">Owner</p>
+        <p class="team-desc">Seorang ahli TJKT dengan spesialisasi dalam pengembangan sistem terdistribusi, jaringan komputer, dan integrasi blockchain. Memiliki pengalaman dalam membangun infrastruktur Web3 yang scalable dan aman. -Artificial Intelligence</p>
+        
+        <h4 style="color: var(--neon); margin: 1.5rem 0 1rem;">Keahlian Pemrograman TJKT3</h4>
+        <div class="skills-grid">
+          <div class="skill-item">
+            <div class="skill-name">Blockchain Development</div>
+            <div class="skill-level"><div class="skill-progress" data-width="95"></div></div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-name">Smart Contracts</div>
+            <div class="skill-level"><div class="skill-progress" data-width="90"></div></div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-name">Jaringan Komputer</div>
+            <div class="skill-level"><div class="skill-progress" data-width="92"></div></div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-name">Keamanan Siber</div>
+            <div class="skill-level"><div class="skill-progress" data-width="88"></div></div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-name">Web3 Integration</div>
+            <div class="skill-level"><div class="skill-progress" data-width="85"></div></div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-name">IoT & Blockchain</div>
+            <div class="skill-level"><div class="skill-progress" data-width="80"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- CTA Section -->
+  <section class="about-section">
+    <div class="cta-section fade-in">
+      <h2 class="cta-title">Bergabunglah dengan Perjalanan Kami</h2>
+      <p class="cta-text">Mari bersama-sama membentuk masa depan digital yang lebih terbuka, aman, dan terdesentralisasi dengan menerapkan prinsip-prinsip TJKT. Jelajahi peluang kolaborasi dan menjadi bagian dari revolusi Web3.</p>
+      <a href="kontak.html" class="btn">Hubungi Kami</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    © 2025 Owner labeled as Al-generated
+  </footer>
+
+  <!-- NEW: Modal for Focus Areas -->
+  <div class="modal" id="techModal">
+    <div class="modal-content">
+      <button class="modal-close" id="modalClose">
+        <i class="fas fa-times"></i>
+      </button>
+      <h2 class="modal-title" id="modalTitle">Judul Teknologi</h2>
+      <p class="modal-desc" id="modalDesc">Deskripsi teknologi akan ditampilkan di sini.</p>
+      <h3 style="color: var(--neon); margin: 1.5rem 0 1rem;">Teknologi yang Digunakan:</h3>
+      <ul class="modal-tech-list" id="modalTechList">
+        <!-- Technology list will be populated by JavaScript -->
+      </ul>
+    </div>
+  </div>
+
+  <!-- Mobile Menu Cards -->
+  <div class="mobile-menu-cards" id="mobileMenuCards">
+    <div class="menu-cards-container">
+      <a href="index.html" class="menu-card mobile-card-hover" data-page="beranda">
+        <i class="fas fa-home"></i>
+        <span>Beranda</span>
+      </a>
+      <a href="berita.html" class="menu-card mobile-card-hover" data-page="berita">
+        <i class="fas fa-newspaper"></i>
+        <span>Berita</span>
+      </a>
+      <a href="tentang.html" class="menu-card mobile-card-hover active" data-page="tentang">
+        <i class="fas fa-info-circle"></i>
+        <span>Tentang</span>
+      </a>
+      <a href="kontak.html" class="menu-card mobile-card-hover" data-page="kontak">
+        <i class="fas fa-envelope"></i>
+        <span>Kontak</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Scroll to Top Button -->
+  <button class="scroll-to-top" id="scrollToTop">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <script>
+    // Data untuk modal teknologi
+    const techData = {
+      blockchain: {
+        title: "Jaringan Blockchain",
+        desc: "Kami mengembangkan infrastruktur blockchain yang scalable dan efisien dengan fokus pada desentralisasi penuh dan keamanan tingkat tinggi. Teknologi kami mendukung berbagai konsensus termasuk Proof-of-Stake dan Byzantine Fault Tolerance.",
+        tech: [
+          "Ethereum & Solidity untuk Smart Contracts",
+          "Hyperledger Fabric untuk enterprise solutions",
+          "IPFS untuk penyimpanan terdesentralisasi",
+          "Polkadot & Cosmos untuk interoperabilitas",
+          "Zero-knowledge proofs untuk privasi transaksi"
+        ]
+      },
+      security: {
+        title: "Keamanan Jaringan",
+        desc: "Sistem keamanan kami dirancang untuk melindungi dari berbagai ancaman siber dengan pendekatan berlapis. Kami menerapkan enkripsi end-to-end dan monitoring real-time untuk mendeteksi dan mencegah serangan.",
+        tech: [
+          "Enkripsi AES-256 & RSA-4096",
+          "Multi-factor authentication",
+          "Smart contract auditing tools",
+          "Intrusion detection systems",
+          "Quantum-resistant cryptography"
+        ]
+      },
+      optimization: {
+        title: "Optimasi Kinerja",
+        desc: "Kami mengoptimalkan performa jaringan dengan teknik canggih seperti sharding, layer-2 solutions, dan algoritma konsensus yang efisien untuk mencapai throughput tinggi dengan latensi minimal.",
+        tech: [
+          "Sharding untuk partisi data",
+          "Layer-2 solutions (Rollups, State Channels)",
+          "Algoritma konsensus Proof-of-Stake",
+          "CDN & edge computing",
+          "Load balancing & caching strategies"
+        ]
+      },
+      iot: {
+        title: "IoT & Web3",
+        desc: "Kami mengintegrasikan perangkat IoT dengan ekosistem Web3 untuk menciptakan aplikasi terdesentralisasi yang inovatif. Solusi kami memungkinkan perangkat IoT untuk berinteraksi secara aman dengan smart contracts.",
+        tech: [
+          "IoT sensors dengan integrasi blockchain",
+          "Smart contracts untuk automation",
+          "Oracle networks untuk data eksternal",
+          "Edge computing untuk processing lokal",
+          "LPWAN (LoRaWAN, NB-IoT) untuk konektivitas"
+        ]
+      },
+      "5g": {
+        title: "Jaringan 5G & Web3",
+        desc: "Kami memanfaatkan teknologi 5G untuk meningkatkan skalabilitas dan kecepatan transaksi Web3. Integrasi ini memungkinkan aplikasi real-time dengan latency ultra-rendah pada jaringan terdesentralisasi.",
+        tech: [
+          "Network slicing untuk QoS yang berbeda",
+          "Mobile Edge Computing (MEC)",
+          "Ultra-reliable low-latency communication",
+          "Massive machine-type communications",
+          "Integration dengan Web3 mobile dApps"
+        ]
+      },
+      cryptography: {
+        title: "Kriptografi Jaringan",
+        desc: "Kami menerapkan algoritma kriptografi modern untuk mengamankan komunikasi dalam jaringan terdesentralisasi. Teknologi kami termasuk enkripsi homomorfik, zero-knowledge proofs, dan signature schemes yang aman.",
+        tech: [
+          "Zero-knowledge proofs (zk-SNARKs, zk-STARKs)",
+          "Homomorphic encryption",
+          "Post-quantum cryptography",
+          "Multi-signature schemes",
+          "Threshold cryptography"
+        ]
+      }
+    };
+
+    // Loading Screen
+    window.addEventListener('load', () => {
+      const loading = document.getElementById('loading');
+      setTimeout(() => {
+        loading.classList.add('hidden');
+      }, 1000);
+    });
+
+    // Mobile Plus Button Toggle
+    const mobilePlusBtn = document.getElementById('mobilePlusBtn');
+    const mobileMenuCards = document.getElementById('mobileMenuCards');
+    
+    mobilePlusBtn.addEventListener('click', () => {
+      mobilePlusBtn.classList.toggle('active');
+      mobileMenuCards.classList.toggle('active');
+    });
+
+    // Close mobile menu cards when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!mobileMenuCards.contains(e.target) && !mobilePlusBtn.contains(e.target)) {
+        mobilePlusBtn.classList.remove('active');
+        mobileMenuCards.classList.remove('active');
+      }
+    });
+
+    // Deteksi status koneksi
+    function updateOnlineStatus() {
+      const offlineIndicator = document.getElementById('offlineIndicator');
+      
+      if (navigator.onLine) {
+        offlineIndicator.classList.remove('show');
+      } else {
+        offlineIndicator.classList.add('show');
+      }
+    }
+
+    // Scroll Effects
+    window.addEventListener('scroll', () => {
+      const navbar = document.getElementById('navbar');
+      const scrollToTop = document.getElementById('scrollToTop');
+      
+      // Navbar background change on scroll
+      if (window.scrollY > 60) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+      
+      // Show/hide scroll to top button
+      if (window.scrollY > 500) {
+        scrollToTop.classList.add('visible');
+      } else {
+        scrollToTop.classList.remove('visible');
+      }
+      
+      // Animate elements on scroll
+      animateOnScroll();
+      animateTimeline();
+      animateSkills();
+    });
+
+    // Scroll to Top Functionality
+    document.getElementById('scrollToTop').addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+
+    // Animate elements on scroll
+    function animateOnScroll() {
+      const fadeElements = document.querySelectorAll('.fade-in');
+      
+      fadeElements.forEach(element => {
+        const elementTop = element.getBoundingClientRect().top;
+        const elementVisible = 150;
+        
+        if (elementTop < window.innerHeight - elementVisible) {
+          element.style.opacity = '1';
+          element.style.transform = 'translateY(0)';
+        }
+      });
+    }
+
+    // Animate timeline items on scroll
+    function animateTimeline() {
+      const timelineItems = document.querySelectorAll('.timeline-item');
+      
+      timelineItems.forEach(item => {
+        const itemTop = item.getBoundingClientRect().top;
+        const itemVisible = 150;
+        
+        if (itemTop < window.innerHeight - itemVisible) {
+          item.classList.add('visible');
+        }
+      });
+    }
+
+    // Animate skill progress bars when they come into view
+    function animateSkills() {
+      const skillProgresses = document.querySelectorAll('.skill-progress');
+      
+      skillProgresses.forEach(progress => {
+        const progressTop = progress.getBoundingClientRect().top;
+        
+        if (progressTop < window.innerHeight - 100) {
+          const width = progress.getAttribute('data-width');
+          progress.style.width = width + '%';
+        }
+      });
+    }
+
+    // Initialize fade-in elements
+    document.querySelectorAll('.fade-in').forEach(element => {
+      element.style.opacity = '0';
+      element.style.transform = 'translateY(30px)';
+      element.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+    });
+
+    // NAV AKTIF OTOMATIS
+    const currentPage = location.pathname.split('/').pop().replace('.html', '') || 'beranda';
+    document.querySelectorAll('nav a, .menu-card').forEach(link => {
+      if (link.getAttribute('data-page') === currentPage) {
+        link.classList.add('active');
+      }
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelectorAll('nav a, .menu-card').forEach(a => a.classList.remove('active'));
+        link.classList.add('active');
+        
+        // Tutup menu mobile setelah memilih
+        mobilePlusBtn.classList.remove('active');
+        mobileMenuCards.classList.remove('active');
+        
+        setTimeout(() => window.location.href = link.href, 200);
+      });
+    });
+
+    // Add hover effects for mobile cards
+    document.querySelectorAll('.menu-card').forEach(card => {
+      card.addEventListener('touchstart', function() {
+        this.classList.add('hover');
+      });
+      
+      card.addEventListener('touchend', function() {
+        this.classList.remove('hover');
+      });
+    });
+
+    // NEW: Timeline Expandable Details
+    document.querySelectorAll('.timeline-content').forEach(item => {
+      item.addEventListener('click', function() {
+        const details = this.querySelector('.timeline-details');
+        if (details) {
+          details.classList.toggle('expanded');
+          this.classList.toggle('expanded');
+        }
+      });
+    });
+
+    // NEW: Modal Functionality
+    const modal = document.getElementById('techModal');
+    const modalClose = document.getElementById('modalClose');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDesc = document.getElementById('modalDesc');
+    const modalTechList = document.getElementById('modalTechList');
+
+    // Open modal when focus card is clicked
+    document.querySelectorAll('.focus-card').forEach(card => {
+      card.addEventListener('click', function() {
+        const techType = this.getAttribute('data-modal');
+        if (techData[techType]) {
+          modalTitle.textContent = techData[techType].title;
+          modalDesc.textContent = techData[techType].desc;
+          
+          // Clear and populate tech list
+          modalTechList.innerHTML = '';
+          techData[techType].tech.forEach(tech => {
+            const li = document.createElement('li');
+            li.innerHTML = `<i class="fas fa-check"></i> ${tech}`;
+            modalTechList.appendChild(li);
+          });
+          
+          modal.classList.add('active');
+        }
+      });
+    });
+
+    // Close modal
+    modalClose.addEventListener('click', () => {
+      modal.classList.remove('active');
+    });
+
+    // Close modal when clicking outside
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('active');
+      }
+    });
+
+    // PARTIKEL GALAXY
+    const canvas = document.getElementById('galaxy');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function getParticleCount() {
+      const w = window.innerWidth;
+      if (w <= 576) return 60;
+      if (w <= 768) return 100;
+      if (w <= 992) return 150;
+      if (w <= 1200) return 200;
+      if (w <= 1600) return 250;
+      return 300;
+    }
+
+    function initParticles() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      particles = [];
+      for (let i = 0; i < getParticleCount(); i++) particles.push(new Particle());
+    }
+
+    class Particle {
+      constructor() { this.reset(); }
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2.5 + 0.5;
+        this.speedX = Math.random() * 0.8 - 0.4;
+        this.speedY = Math.random() * 0.8 - 0.4;
+        this.opacity = Math.random() * 0.7 + 0.3;
+      }
+      update() {
+        this.x += this.speedX; 
+        this.y += this.speedY;
+        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+      }
+      draw() {
+        ctx.fillStyle = `rgba(0, 243, 255, ${this.opacity})`;
+        ctx.beginPath(); 
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); 
+        ctx.fill();
+      }
+    }
+
+    function animate() {
+      ctx.fillStyle = 'rgba(10, 10, 42, 0.06)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => { 
+        p.update(); 
+        p.draw(); 
+      });
+      requestAnimationFrame(animate);
+    }
+
+    // Combine scroll animations
+    function handleScrollAnimations() {
+      animateOnScroll();
+      animateTimeline();
+      animateSkills();
+    }
+
+    window.addEventListener('scroll', handleScrollAnimations);
+    window.addEventListener('resize', initParticles);
+    
+    // Initialize on load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        animateOnScroll();
+        animateTimeline();
+        animateSkills();
+      }, 500);
+    });
+
+    // OFFLINE/ONLINE EVENT LISTENERS
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+
+    initParticles(); 
+    animate();
+  </script>
+</body>
+</html>

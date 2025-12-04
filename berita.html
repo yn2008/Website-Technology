@@ -1,0 +1,3351 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Berita Teknologi 2025 | ARIF Galaxy Web3</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg1: #0a0a2a;
+      --bg2: #1a1a4a;
+      --neon: #00f3ff;
+      --purple: #9d00ff;
+      --text: #fff;
+      --max-w: 1600px;
+      --pad: 5%;
+      --card-bg: rgba(26, 26, 74, 0.6);
+      --card-border: rgba(0, 243, 255, 0.2);
+      --success: #00ff88; 
+      --error: #ff4444; 
+      --warning: #ffaa00;
+    }
+
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+      color: var(--text);
+      font-family: 'Orbitron', sans-serif;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* Offline indicator */
+    .offline-indicator {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: var(--warning);
+      color: var(--bg1);
+      text-align: center;
+      padding: 0.5rem;
+      z-index: 10001;
+      font-weight: bold;
+      transform: translateY(-100%);
+      transition: transform 0.3s ease;
+    }
+    
+    .offline-indicator.show {
+      transform: translateY(0);
+    }
+
+    /* Header & Navigation */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(10, 10, 42, 0.85);
+      backdrop-filter: blur(12px);
+      padding: clamp(0.8rem, 2vw, 1.5rem) var(--pad);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.4s ease;
+    }
+    header.scrolled {
+      background: rgba(10,10,42,0.95);
+      padding: 0.6rem var(--pad);
+    }
+    .logo {
+      font-size: clamp(1.4rem, 4vw, 2.2rem);
+      font-weight: 900;
+      color: var(--neon);
+      text-shadow: 0 0 12px var(--neon);
+      transition: all 0.3s;
+    }
+    header.scrolled .logo {
+      font-size: clamp(1.2rem, 3vw, 1.8rem);
+    }
+
+    nav ul {
+      display: flex;
+      gap: clamp(1.5rem, 2.5vw, 3rem);
+      list-style: none;
+    }
+
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: clamp(0.85rem, 2vw, 1.1rem);
+      position: relative;
+      padding: 0.5rem 0;
+      transition: color 0.3s;
+    }
+
+    nav a::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      width: 0;
+      height: 3px;
+      background: var(--neon);
+      border-radius: 2px;
+      transition: width 0.4s;
+    }
+
+    nav a:hover::after,
+    nav a.active::after {
+      width: 100%;
+    }
+
+    nav a:hover,
+    nav a.active {
+      color: var(--neon);
+      text-shadow: 0 0 10px var(--neon);
+    }
+    
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--neon);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    /* Plus Button di Kanan Atas untuk Mobile */
+    .mobile-plus-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--neon);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    
+    .mobile-plus-btn.active {
+      transform: rotate(45deg);
+      background: rgba(0, 243, 255, 0.1);
+    }
+
+    /* Main Content */
+    .content {
+      flex: 1 0 auto;
+      padding: clamp(120px, 15vh, 160px) var(--pad) 3rem;
+      max-width: var(--max-w);
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .content h1 {
+      font-size: clamp(2.2rem, 6vw, 4.5rem);
+      background: linear-gradient(90deg, var(--neon), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 2rem;
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    /* Search, Filter & Controls */
+    .news-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 250px;
+      max-width: 500px;
+    }
+    
+    .search-box input {
+      width: 100%;
+      padding: 0.8rem 1rem 0.8rem 2.8rem;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 50px;
+      color: var(--text);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+    
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--neon);
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+    }
+    
+    .search-box i {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--neon);
+    }
+    
+    .filter-controls {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .filter-select {
+      padding: 0.8rem 1rem;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 150px;
+    }
+    
+    .filter-select:focus {
+      outline: none;
+      border-color: var(--neon);
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+    }
+    
+    .utility-buttons {
+      display: flex;
+      gap: 0.8rem;
+    }
+    
+    .utility-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      color: var(--text);
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .utility-btn:hover, .utility-btn.active {
+      background: rgba(0, 243, 255, 0.1);
+      border-color: var(--neon);
+      color: var(--neon);
+    }
+    
+    .utility-btn .badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--neon);
+      color: var(--bg1);
+      font-size: 0.7rem;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .news-grid {
+      display: grid;
+      gap: 2.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+
+    .news-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 0 25px rgba(0, 243, 255, 0.15);
+      transition: all 0.4s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .news-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,243,255,0.1));
+      transition: left 0.6s;
+      z-index: 1;
+    }
+    .news-card:hover::before {
+      left: 100%;
+    }
+    .news-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 0 35px rgba(0, 243, 255, 0.3);
+    }
+    
+    .news-card-header {
+      position: relative;
+    }
+    
+    .news-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s;
+    }
+    .news-card:hover img {
+      transform: scale(1.05);
+    }
+    
+    .bookmark-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 2;
+    }
+    
+    .bookmark-btn:hover, .bookmark-btn.active {
+      background: var(--neon);
+      color: var(--bg1);
+    }
+    
+    .news-tag {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(157, 0, 255, 0.8);
+      color: white;
+      padding: 0.3rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+
+    .news-body {
+      padding: 1.5rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .news-body h3 {
+      font-size: 1.3rem;
+      margin-bottom: 0.8rem;
+      color: var(--neon);
+    }
+
+    .news-body p {
+      font-size: 0.95rem;
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+    
+    .news-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+    
+    /* Tambahan style untuk last-read */
+    .last-read {
+      font-size: 0.75rem;
+      color: var(--neon);
+      font-weight: bold;
+    }
+
+    /* MODAL STYLES */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(12px);
+      z-index: 2000;
+      overflow-y: auto;
+      padding: 2rem;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .modal.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      border-radius: 20px;
+      max-width: 900px;
+      margin: auto;
+      overflow: hidden;
+      box-shadow: 0 0 50px rgba(0, 243, 255, 0.5);
+      animation: modalSlide 0.6s ease-out;
+      position: relative;
+      overflow: hidden;
+    }
+    .modal-content::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,243,255,0.1));
+      transition: left 0.6s;
+      z-index: 1;
+    }
+    .modal-content:hover::before {
+      left: 100%;
+    }
+
+    .modal-header {
+      position: relative;
+    }
+
+    .modal-header img {
+      width: 100%;
+      height: 320px;
+      object-fit: cover;
+      transition: transform 0.6s;
+    }
+    .modal-content:hover .modal-header img {
+      transform: scale(1.02);
+    }
+    
+    .modal-bookmark-btn {
+      position: absolute;
+      top: 18px;
+      right: 70px;
+      background: rgba(0, 0, 0, 0.7);
+      border: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+    
+    .modal-bookmark-btn:hover, .modal-bookmark-btn.active {
+      background: var(--neon);
+      color: var(--bg1);
+    }
+    
+    /* Tombol Mode Baca di Modal */
+    .modal-reading-mode-btn {
+      position: absolute;
+      top: 18px;
+      right: 120px;
+      background: rgba(0, 0, 0, 0.7);
+      border: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+    
+    .modal-reading-mode-btn:hover, .modal-reading-mode-btn.active {
+      background: var(--neon);
+      color: var(--bg1);
+    }
+
+    .modal-body {
+      padding: 2.5rem;
+      color: #eee;
+      line-height: 1.9;
+      position: relative;
+      z-index: 2;
+    }
+
+    .modal-body h2 {
+      font-size: 2.2rem;
+      color: var(--neon);
+      margin-bottom: 1.8rem;
+      text-shadow: 0 0 12px var(--neon);
+    }
+
+    .modal-body p {
+      margin-bottom: 1.4rem;
+      font-size: 1.05rem;
+      text-align: justify;
+    }
+
+    .modal-body p strong {
+      color: var(--neon);
+    }
+    
+    .modal-tag {
+      display: inline-block;
+      background: var(--purple);
+      color: white;
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-bottom: 1.5rem;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 18px;
+      right: 22px;
+      background: rgba(0, 0, 0, 0.7);
+      color: var(--neon);
+      border: 2px solid var(--neon);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      font-size: 1.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.3s;
+      z-index: 10;
+    }
+
+    .close-modal:hover {
+      background: var(--neon);
+      color: #000;
+      transform: rotate(90deg);
+    }
+    
+    /* Modal Navigation Styles */
+    .modal-navigation {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2.5rem;
+      background: rgba(10, 10, 42, 0.8);
+      border-top: 1px solid var(--card-border);
+      position: sticky;
+      bottom: 0;
+      z-index: 10;
+    }
+    
+    .modal-nav-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 0.8rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .modal-nav-btn:hover {
+      background: rgba(0, 243, 255, 0.1);
+      border-color: var(--neon);
+      color: var(--neon);
+    }
+    
+    .modal-nav-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .modal-nav-btn:disabled:hover {
+      background: var(--card-bg);
+      border-color: var(--card-border);
+      color: var(--text);
+    }
+    
+    .modal-nav-info {
+      color: var(--neon);
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    
+    /* Reading Mode - Style khusus seperti koran/majalah */
+    .reading-mode .modal-content {
+      max-width: 800px;
+      background: #fefefe;
+      color: #333;
+      box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .reading-mode .modal-header {
+      background: #f5f5f5;
+      padding: 2rem 2.5rem 0;
+    }
+    
+    .reading-mode .modal-header img {
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .reading-mode .modal-body {
+      padding: 2.5rem;
+      color: #444;
+      line-height: 1.8;
+      font-family: 'Georgia', serif;
+    }
+    
+    .reading-mode .modal-body h2 {
+      color: #222;
+      text-shadow: none;
+      font-size: 2.4rem;
+      line-height: 1.3;
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+    }
+    
+    .reading-mode .modal-body p {
+      color: #444;
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+      text-align: justify;
+    }
+    
+    .reading-mode .modal-body p:first-of-type:first-letter {
+      float: left;
+      font-size: 4rem;
+      line-height: 3.5rem;
+      padding-top: 0.5rem;
+      padding-right: 0.5rem;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+    
+    .reading-mode .modal-body p strong {
+      color: #000;
+      font-weight: 700;
+    }
+    
+    .reading-mode .modal-tag {
+      background: #666;
+      font-family: 'Orbitron', sans-serif;
+    }
+    
+    .reading-mode .modal-navigation {
+      background: rgba(255, 255, 255, 0.95);
+      border-top: 1px solid #ddd;
+    }
+    
+    .reading-mode .modal-nav-btn {
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+      color: #333;
+      font-family: 'Orbitron', sans-serif;
+    }
+    
+    .reading-mode .modal-nav-btn:hover {
+      background: #e9e9e9;
+      border-color: #999;
+      color: #000;
+    }
+    
+    .reading-mode .modal-nav-info {
+      color: #555;
+    }
+    
+    .reading-mode .modal-bookmark-btn,
+    .reading-mode .modal-reading-mode-btn {
+      background: rgba(255, 255, 255, 0.9);
+      color: #333;
+      border: 1px solid #ddd;
+    }
+    
+    .reading-mode .modal-bookmark-btn:hover,
+    .reading-mode .modal-reading-mode-btn:hover {
+      background: #f0f0f0;
+    }
+    
+    .reading-mode .modal-bookmark-btn.active,
+    .reading-mode .modal-reading-mode-btn.active {
+      background: #2c3e50;
+      color: white;
+    }
+    
+    .reading-mode .close-modal {
+      background: rgba(255, 255, 255, 0.9);
+      color: #333;
+      border: 1px solid #ddd;
+    }
+    
+    .reading-mode .close-modal:hover {
+      background: #e74c3c;
+      color: white;
+      border-color: #e74c3c;
+    }
+
+    /* Side Panel for Bookmarks & History */
+    .side-panel {
+      position: fixed;
+      top: 0;
+      right: -400px;
+      width: 380px;
+      height: 100vh;
+      background: var(--bg1);
+      z-index: 1500;
+      transition: right 0.4s ease;
+      box-shadow: -5px 0 20px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    .side-panel.active {
+      right: 0;
+    }
+    
+    .side-panel-header {
+      padding: 1.5rem;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .side-panel-header h3 {
+      color: var(--neon);
+      font-size: 1.3rem;
+    }
+    
+    .panel-controls {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .panel-control-btn {
+      background: none;
+      border: none;
+      color: var(--neon);
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .panel-control-btn:hover {
+      background: rgba(0, 243, 255, 0.1);
+      transform: scale(1.1);
+    }
+    
+    .close-panel {
+      background: none;
+      border: none;
+      color: var(--neon);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: transform 0.3s;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .close-panel:hover {
+      transform: scale(1.2);
+      background: rgba(0, 243, 255, 0.1);
+    }
+    
+    .side-panel-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+    }
+    
+    .side-panel-item {
+      display: flex;
+      gap: 1rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background: var(--card-bg);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .side-panel-item:hover {
+      transform: translateX(5px);
+      box-shadow: 0 5px 15px rgba(0, 243, 255, 0.2);
+    }
+    
+    .side-panel-item img {
+      width: 80px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    
+    .side-panel-item-content {
+      flex: 1;
+    }
+    
+    .side-panel-item-content h4 {
+      font-size: 0.95rem;
+      color: var(--neon);
+      margin-bottom: 0.3rem;
+    }
+    
+    .side-panel-item-content p {
+      font-size: 0.8rem;
+      opacity: 0.8;
+      margin-bottom: 0.5rem;
+    }
+    
+    .side-panel-item-meta {
+      font-size: 0.7rem;
+      opacity: 0.6;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .remove-item-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(255, 68, 68, 0.7);
+      border: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      color: white;
+      font-size: 0.7rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    
+    .remove-item-btn:hover {
+      background: var(--error);
+      transform: scale(1.1);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      opacity: 0.7;
+    }
+    
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: var(--neon);
+    }
+
+    /* Scroll to Top Button */
+    .scroll-to-top {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      background: var(--neon);
+      color: var(--bg1);
+      border: none;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0,243,255,0.5);
+      transition: all 0.3s;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+    }
+    .scroll-to-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+    .scroll-to-top:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 25px var(--neon);
+    }
+
+    /* Loading Animation */
+    .loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s, visibility 0.5s;
+    }
+    .loading.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 5px solid rgba(0,243,255,0.3);
+      border-top: 5px solid var(--neon);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    footer {
+      flex-shrink: 0;
+      text-align: center;
+      padding: clamp(1.5rem, 3vw, 2.5rem) var(--pad);
+      background: rgba(0, 0, 0, 0.4);
+      font-size: clamp(0.85rem, 1.5vw, 1rem);
+      color: #ccc;
+      backdrop-filter: blur(5px);
+      position: relative;
+    }
+    footer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to top, rgba(0,243,255,0.05), transparent);
+    }
+
+    /* Menu Card Styles untuk Mobile */
+    .mobile-menu-cards {
+      display: none;
+      position: fixed;
+      top: 70px;
+      right: 15px;
+      width: 150px;
+      background: rgba(10, 10, 42, 0.95);
+      backdrop-filter: blur(15px);
+      border: 1px solid var(--neon);
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0, 243, 255, 0.2);
+      z-index: 999;
+      padding: 0.8rem;
+      animation: slideDown 0.3s ease-out;
+    }
+    
+    @keyframes slideDown {
+      from { 
+        opacity: 0;
+        transform: translateY(-20px); 
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0); 
+      }
+    }
+    
+    .mobile-menu-cards.active {
+      display: block;
+    }
+    
+    .menu-cards-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .menu-card {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.7rem 0.5rem;
+      border-radius: 8px;
+      background: transparent;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--text);
+    }
+    
+    .menu-card:hover, .menu-card.active {
+      background: rgba(0, 243, 255, 0.1);
+    }
+    
+    .menu-card i {
+      font-size: 1rem;
+      width: 20px;
+      text-align: center;
+      color: var(--neon);
+      transition: all 0.3s ease;
+    }
+    
+    .menu-card.active i, .menu-card:hover i {
+      transform: scale(1.2);
+      text-shadow: 0 0 8px var(--neon);
+    }
+    
+    .menu-card span {
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .menu-card.active span, .menu-card:hover span {
+      color: var(--neon);
+    }
+
+    /* Enhanced Card Animation untuk Mobile */
+    .mobile-card-hover {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .mobile-card-hover::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,243,255,0.1));
+      transition: left 0.6s;
+    }
+    
+    .mobile-card-hover:hover::before {
+      left: 100%;
+    }
+
+    /* NOTIFIKASI MODE BACA */
+    .reading-mode-notification {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--card-bg);
+      border: 1px solid var(--neon);
+      border-radius: 12px;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 5px 25px rgba(0, 243, 255, 0.3);
+      z-index: 2001;
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      max-width: 90%;
+      width: auto;
+      backdrop-filter: blur(10px);
+    }
+    
+    .reading-mode-notification.active {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    
+    .reading-mode-notification.reading-active {
+      border-color: var(--success);
+      box-shadow: 0 5px 25px rgba(0, 255, 136, 0.3);
+    }
+    
+    .reading-mode-notification.reading-inactive {
+      border-color: var(--warning);
+      box-shadow: 0 5px 25px rgba(255, 170, 0, 0.3);
+    }
+    
+    .notification-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    
+    .reading-active .notification-icon {
+      background: rgba(0, 255, 136, 0.2);
+      color: var(--success);
+    }
+    
+    .reading-inactive .notification-icon {
+      background: rgba(255, 170, 0, 0.2);
+      color: var(--warning);
+    }
+    
+    .notification-content {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .notification-title {
+      font-weight: 700;
+      margin-bottom: 4px;
+      font-size: 0.95rem;
+    }
+    
+    .notification-message {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      line-height: 1.4;
+    }
+    
+    .notification-close {
+      background: none;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 1rem;
+      opacity: 0.7;
+      transition: all 0.3s ease;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .notification-close:hover {
+      opacity: 1;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Responsif untuk notifikasi */
+    @media (max-width: 768px) {
+      .reading-mode-notification {
+        width: 90%;
+        padding: 12px 16px;
+      }
+      
+      .notification-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+      }
+      
+      .notification-title {
+        font-size: 0.9rem;
+      }
+      
+      .notification-message {
+        font-size: 0.8rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .reading-mode-notification {
+        width: 95%;
+        padding: 10px 14px;
+      }
+      
+      .notification-icon {
+        width: 32px;
+        height: 32px;
+      }
+    }
+
+    /* Animations */
+    @keyframes glow {
+      from { text-shadow: 0 0 20px var(--neon); }
+      to { text-shadow: 0 0 30px var(--neon), 0 0 40px var(--purple); }
+    }
+
+    @keyframes modalSlide {
+      from { transform: translateY(60px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fade-in {
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      /* Sembunyikan menu desktop dan hamburger */
+      nav {
+        display: none;
+      }
+      
+      .mobile-menu-btn {
+        display: none;
+      }
+      
+      /* Tampilkan tombol plus di kanan atas */
+      .mobile-plus-btn {
+        display: flex;
+      }
+      
+      .modal-body {
+        padding: 1.8rem;
+      }
+      .modal-body h2 {
+        font-size: 1.7rem;
+      }
+      .modal-header img {
+        height: 200px;
+      }
+      
+      .modal-navigation {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+      
+      .modal-nav-btn {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .scroll-to-top {
+        bottom: 80px;
+        right: 20px;
+        width: 45px;
+        height: 45px;
+        font-size: 1rem;
+      }
+      
+      /* Menu Cards untuk Mobile */
+      .mobile-menu-cards {
+        display: none;
+      }
+      
+      .mobile-menu-cards.active {
+        display: block;
+      }
+      
+      /* News Controls Responsive */
+      .news-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .search-box {
+        max-width: 100%;
+      }
+      
+      .filter-controls {
+        justify-content: space-between;
+      }
+      
+      .filter-select {
+        flex: 1;
+      }
+      
+      .side-panel {
+        width: 100%;
+        right: -100%;
+      }
+      
+      /* Adjust footer padding untuk mobile dengan menu cards */
+      footer {
+        padding-bottom: clamp(1.5rem, 3vw, 2.5rem);
+      }
+      
+      /* Responsive improvements */
+      .news-card {
+        margin-bottom: 1.5rem;
+      }
+      
+      .news-controls {
+        gap: 0.8rem;
+      }
+      
+      .filter-controls {
+        width: 100%;
+      }
+      
+      .utility-buttons {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      .utility-btn {
+        flex: 1;
+        max-width: 60px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      header {
+        flex-direction: row;
+      }
+      .news-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .filter-controls {
+        flex-direction: column;
+      }
+      
+      .filter-select {
+        width: 100%;
+      }
+      
+      .modal-body {
+        padding: 1.5rem;
+      }
+      
+      .modal-body h2 {
+        font-size: 1.5rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .content {
+        padding: clamp(100px, 12vh, 140px) 4% 2rem;
+      }
+      
+      .news-grid {
+        gap: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Offline Indicator -->
+  <div class="offline-indicator" id="offlineIndicator">
+    <i class="fas fa-wifi"></i> Anda sedang offline. Beberapa fitur mungkin tidak tersedia.
+  </div>
+
+  <!-- Notifikasi Mode Baca -->
+  <div class="reading-mode-notification" id="readingModeNotification">
+    <div class="notification-icon">
+      <i class="fas fa-book-open"></i>
+    </div>
+    <div class="notification-content">
+      <div class="notification-title" id="notificationTitle">Mode Baca Diaktifkan</div>
+      <div class="notification-message" id="notificationMessage">Pengalaman membaca yang lebih nyaman telah diaktifkan</div>
+    </div>
+    <button class="notification-close" id="notificationClose">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <canvas id="galaxy"></canvas>
+
+  <!-- Header -->
+  <header id="navbar">
+    <div class="logo">ARIF</div>
+    
+    <!-- Tombol Plus untuk Mobile -->
+    <button class="mobile-plus-btn" id="mobilePlusBtn">
+      <i class="fas fa-plus"></i>
+    </button>
+    
+    <!-- Navigasi Desktop -->
+    <nav id="mainNav">
+      <ul>
+        <li><a href="index.html" data-page="beranda">Beranda</a></li>
+        <li><a href="berita.html" data-page="berita" class="active">Berita</a></li>
+        <li><a href="tentang.html" data-page="tentang">Tentang</a></li>
+        <li><a href="kontak.html" data-page="kontak">Kontak</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="content">
+    <h1 class="fade-in">Teknologi 2025</h1>
+    
+    <!-- Controls: Search, Filter, Bookmarks, History -->
+    <div class="news-controls fade-in">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Cari berita...">
+      </div>
+      
+      <div class="filter-controls">
+        <select class="filter-select" id="categoryFilter">
+          <option value="">Semua Kategori</option>
+          <option value="AI">AI & Robotika</option>
+          <option value="Telekomunikasi">Telekomunikasi</option>
+          <option value="Energi">Energi</option>
+          <option value="Blockchain">Blockchain</option>
+          <option value="Bioteknologi">Bioteknologi</option>
+          <option value="Transportasi">Transportasi</option>
+          <option value="Quantum">Quantum Computing</option>
+        </select>
+        
+        <select class="filter-select" id="sortFilter">
+          <option value="newest">Terbaru</option>
+          <option value="oldest">Terlama</option>
+          <option value="popular">Populer</option>
+        </select>
+      </div>
+      
+      <div class="utility-buttons">
+        <button class="utility-btn" id="bookmarksBtn" title="Bookmark">
+          <i class="fas fa-bookmark"></i>
+          <span class="badge" id="bookmarkCount">0</span>
+        </button>
+        <button class="utility-btn" id="historyBtn" title="Riwayat">
+          <i class="fas fa-history"></i>
+          <span class="badge" id="historyCount">0</span>
+        </button>
+        <button class="utility-btn" id="readingModeBtn" title="Mode Baca">
+          <i class="fas fa-book-open"></i>
+        </button>
+      </div>
+    </div>
+    
+    <div class="news-grid">
+
+      <!-- BERITA 1 -->
+      <article class="news-card fade-in" data-modal="modal1" data-category="AI" data-date="2025-03-15">
+        <div class="news-card-header">
+          <img loading="lazy"
+            src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=600&h=400&q=80"
+            alt="Drone AI Gammaforce">
+          <button class="bookmark-btn" data-id="1">
+            <i class="far fa-bookmark"></i>
+          </button>
+          <span class="news-tag">AI & Robotika</span>
+        </div>
+        <div class="news-body">
+          <h3>Gammaforce Juara Kontes Robot Terbang Indonesia 2025</h3>
+          <p>Tim Gammaforce dari Jawa Tengah meraih gelar juara umum dengan inovasi drone cerdas berbasis AI untuk modifikasi cuaca.</p>
+          <div class="news-meta">
+            <span>15 Maret 2025</span>
+            <span class="last-read" data-id="1">Belum dibaca</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- BERITA 2 -->
+      <article class="news-card fade-in" data-modal="modal2" data-category="AI" data-date="2025-03-14">
+        <div class="news-card-header">
+          <img loading="lazy"
+            src="https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?auto=format&fit=crop&w=600&h=400&q=80"
+            alt="AI Neuromorphic">
+          <button class="bookmark-btn" data-id="2">
+            <i class="far fa-bookmark"></i>
+          </button>
+          <span class="news-tag">AI & Robotika</span>
+        </div>
+        <div class="news-body">
+          <h3>5 Tren AI Otonom Dominasi Indonesia 2025</h3>
+          <p>Komputasi neuromorphic dan AI tak terlihat diprediksi tingkatkan efisiensi industri dan layanan publik RI.</p>
+          <div class="news-meta">
+            <span>14 Maret 2025</span>
+            <span class="last-read" data-id="2">Belum dibaca</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- BERITA 3 -->
+      <article class="news-card fade-in" data-modal="modal3" data-category="Telekomunikasi" data-date="2025-03-12">
+        <div class="news-card-header">
+          <img loading="lazy"
+            src="https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?auto=format&fit=crop&w=600&h=400&q=80"
+            alt="Jaringan 5G">
+          <button class="bookmark-btn" data-id="3">
+            <i class="far fa-bookmark"></i>
+          </button>
+          <span class="news-tag">Telekomunikasi</span>
+        </div>
+        <div class="news-body">
+          <h3>Ekspansi 5G Ubah Komunikasi di Seluruh Indonesia</h3>
+          <p>Jaringan 5G capai 80 kota besar, dorong IoT kota pintar dan kerja remote hingga pelosok.</p>
+          <div class="news-meta">
+            <span>12 Maret 2025</span>
+            <span class="last-read" data-id="3">Belum dibaca</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- BERITA 4 -->
+      <article class="news-card fade-in" data-modal="modal4" data-category="Bioteknologi" data-date="2025-03-10">
+        <div class="news-card-header">
+          <img loading="lazy"
+            src="https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=600&h=400&q=80"
+            alt="AI Diagnosa Medis">
+          <button class="bookmark-btn" data-id="4">
+            <i class="far fa-bookmark"></i>
+          </button>
+          <span class="news-tag">Bioteknologi</span>
+        </div>
+        <div class="news-body">
+          <h3>Bioteknologi Indonesia Maju: Diagnosa Cepat Berbasis AI</h3>
+          <p>Halodoc integrasikan biotek untuk pengobatan presisi, kurangi waktu diagnosa hingga 50%.</p>
+          <div class="news-meta">
+            <span>10 Maret 2025</span>
+            <span class="last-read" data-id="4">Belum dibaca</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- BERITA 5 -->
+      <article class="news-card fade-in" data-modal="modal5" data-category="Energi" data-date="2025-03-08">
+        <div class="news-card-header">
+          <img loading="lazy"
+            src="https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=600&h=400&q=80"
+            alt="PLTN Bangka Belitung">
+          <button class="bookmark-btn" data-id="5">
+            <i class="far fa-bookmark"></i>
+          </button>
+          <span class="news-tag">Energi</span>
+        </div>
+        <div class="news-body">
+          <h3>Energi Nuklir Dukung Kebutuhan AI di Indonesia 2025</h3>
+          <p>PLTN pertama di Bangka Belitung suplai listrik stabil untuk data center AI nasional.</p>
+          <div class="news-meta">
+            <span>8 Maret 2025</span>
+            <span class="last-read" data-id="5">Belum dibaca</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- BERITA 6 -->
+      <article class="news-card fade-in" data-modal="modal6" data-category="AI" data-date="2025-03-05">
+        <div class="news-card-header">
+          <img loading="lazy"
+            src="https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?auto=format&fit=crop&w=600&h=400&q=80"
+            alt="Tesla Optimus">
+          <button class="bookmark-btn" data-id="6">
+            <i class="far fa-bookmark"></i>
+          </button>
+          <span class="news-tag">AI & Robotika</span>
+        </div>
+        <div class="news-body">
+          <h3>Tesla Optimus Masuk Pasar Indonesia</h3>
+          <p>Robot humanoid Tesla kolaborasi dengan Gojek untuk otomatisasi logistik di Bandung.</p>
+          <div class="news-meta">
+            <span>5 Maret 2025</span>
+            <span class="last-read" data-id="6">Belum dibaca</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- BERITA 7 -->
+      <article class="news-card fade-in" data-modal="modal7" data-category="Telekomunikasi" data-date="2025-03-03">
+        <div class="news-card-header">
+          <img loading="lazy"
+            src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=600&h=400&q=80"
+            alt="Satelit Nusantara 5">
+          <button class="bookmark-btn" data-id="7">
+            <i class="far fa-bookmark"></i>
+          </button>
+          <span class="news-tag">Telekomunikasi</span>
+        </div>
+        <div class="news-body">
+          <h3>Satelit Nusantara 5 Sukses Diluncurkan</h3>
+          <p>Internet 100 Mbps ke 17.000 desa terpencil, dukung e-learning dan UMKM digital.</p>
+          <div class="news-meta">
+            <span>3 Maret 2025</span>
+            <span class="last-read" data-id="7">Belum dibaca</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- BERITA 8 -->
+      <article class="news-card fade-in" data-modal="modal8" data-category="Transportasi" data-date="2025-03-01">
+        <div class="news-card-header">
+          <img loading="lazy"
+            src="https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?auto=format&fit=crop&w=600&h=400&q=80"
+            alt="Kendaraan Listrik Otonom">
+          <button class="bookmark-btn" data-id="8">
+            <i class="far fa-bookmark"></i>
+          </button>
+          <span class="news-tag">Transportasi</span>
+        </div>
+        <div class="news-body">
+          <h3>IKN Uji Coba Kendaraan Listrik Otonom 100 Unit</h3>
+          <p>Kendaraan listrik tanpa sopir dari BYD dan UI mulai beroperasi di Ibu Kota Nusantara.</p>
+          <div class="news-meta">
+            <span>1 Maret 2025</span>
+            <span class="last-read" data-id="8">Belum dibaca</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- BERITA 9 -->
+      <article class="news-card fade-in" data-modal="modal9" data-category="Blockchain" data-date="2025-02-28">
+        <div class="news-card-header">
+          <img loading="lazy"
+            src="https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?auto=format&fit=crop&w=600&h=400&q=80"
+            alt="Blockchain Sertifikat Tanah">
+          <button class="bookmark-btn" data-id="9">
+            <i class="far fa-bookmark"></i>
+          </button>
+          <span class="news-tag">Blockchain</span>
+        </div>
+        <div class="news-body">
+          <h3>Blockchain Nasional: 10 Juta Sertifikat Tanah Digital</h3>
+          <p>Kementerian ATR/BPN gunakan blockchain untuk amankan data tanah dan cegah mafia tanah.</p>
+          <div class="news-meta">
+            <span>28 Februari 2025</span>
+            <span class="last-read" data-id="9">Belum dibaca</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- BERITA 10 -->
+      <article class="news-card fade-in" data-modal="modal10" data-category="Quantum" data-date="2025-02-25">
+        <div class="news-card-header">
+          <img loading="lazy"
+            src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=600&h=400&q=80"
+            alt="Quantum Computing">
+          <button class="bookmark-btn" data-id="10">
+            <i class="far fa-bookmark"></i>
+          </button>
+          <span class="news-tag">Quantum Computing</span>
+        </div>
+        <div class="news-body">
+          <h3>Quantum Computing Indonesia Uji Coba 50-Qubit</h3>
+          <p>Prosesor kuantum pertama Indonesia mulai diuji di Bandung Tech Park dengan investasi Rp 2 triliun.</p>
+          <div class="news-meta">
+            <span>25 Februari 2025</span>
+            <span class="last-read" data-id="10">Belum dibaca</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- BERITA 11 -->
+      <article class="news-card fade-in" data-modal="modal11" data-category="Blockchain" data-date="2025-02-22">
+        <div class="news-card-header">
+          <img loading="lazy"
+            src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=600&h=400&q=80"
+            alt="Regulasi Kripto">
+          <button class="bookmark-btn" data-id="11">
+            <i class="far fa-bookmark"></i>
+          </button>
+          <span class="news-tag">Blockchain</span>
+        </div>
+        <div class="news-body">
+          <h3>ASEAN Setujui Regulasi Kripto Terpadu 2025</h3>
+          <p>Standarisasi perdagangan aset kripto di kawasan ASEAN resmi diberlakukan mulai Januari 2025.</p>
+          <div class="news-meta">
+            <span>22 Februari 2025</span>
+            <span class="last-read" data-id="11">Belum dibaca</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- BERITA 12 -->
+      <article class="news-card fade-in" data-modal="modal12" data-category="AI" data-date="2025-02-20">
+        <div class="news-card-header">
+          <img loading="lazy"
+            src="https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?auto=format&fit=crop&w=600&h=400&q=80"
+            alt="Augmented Reality">
+          <button class="bookmark-btn" data-id="12">
+            <i class="far fa-bookmark"></i>
+          </button>
+          <span class="news-tag">AI & Robotika</span>
+        </div>
+        <div class="news-body">
+          <h3>Smart Glasses AR dengan Neural Interface Diluncurkan</h3>
+          <p>Startup SightTech luncurkan kacamata pintar dengan antarmuka neural untuk kontrol gerakan mata.</p>
+          <div class="news-meta">
+            <span>20 Februari 2025</span>
+            <span class="last-read" data-id="12">Belum dibaca</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- BERITA 13 -->
+      <article class="news-card fade-in" data-modal="modal13" data-category="AI" data-date="2025-02-18">
+        <div class="news-card-header">
+          <img loading="lazy"
+            src="https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=600&h=400&q=80"
+            alt="Pertanian Presisi">
+          <button class="bookmark-btn" data-id="13">
+            <i class="far fa-bookmark"></i>
+          </button>
+          <span class="news-tag">AI & Robotika</span>
+        </div>
+        <div class="news-body">
+          <h3>AI dan Drone Tingkatkan Hasil Panen hingga 40%</h3>
+          <p>Teknologi pertanian presisi dengan AI optimasi irigasi dan pemupukan di lahan pertanian Indonesia.</p>
+          <div class="news-meta">
+            <span>18 Februari 2025</span>
+            <span class="last-read" data-id="13">Belum dibaca</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- BERITA 14 -->
+      <article class="news-card fade-in" data-modal="modal14" data-category="Energi" data-date="2025-02-15">
+        <div class="news-card-header">
+          <img loading="lazy"
+            src="https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?auto=format&fit=crop&w=600&h=400&q=80"
+            alt="Baterai Solid-State">
+          <button class="bookmark-btn" data-id="14">
+            <i class="far fa-bookmark"></i>
+          </button>
+          <span class="news-tag">Energi</span>
+        </div>
+        <div class="news-body">
+          <h3>Baterai Solid-State Nasional Siap Diproduksi Massal</h3>
+          <p>LIPI kembangkan baterai solid-state pertama Indonesia untuk kendaraan listrik dengan kapasitas 500Wh/kg.</p>
+          <div class="news-meta">
+            <span>15 Februari 2025</span>
+            <span class="last-read" data-id="14">Belum dibaca</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- BERITA 15 -->
+      <article class="news-card fade-in" data-modal="modal15" data-category="AI" data-date="2025-02-12">
+        <div class="news-card-header">
+          <img loading="lazy"
+            src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=600&h=400&q=80"
+            alt="Keamanan Siber">
+          <button class="bookmark-btn" data-id="15">
+            <i class="far fa-bookmark"></i>
+          </button>
+          <span class="news-tag">AI & Robotika</span>
+        </div>
+        <div class="news-body">
+          <h3>AI CyberGuard Deteksi 10.000 Serangan Siber per Detik</h3>
+          <p>Sistem keamanan siber berbasis AI mampu netralisasi serangan secara real-time dengan akurasi 99.9%.</p>
+          <div class="news-meta">
+            <span>12 Februari 2025</span>
+            <span class="last-read" data-id="15">Belum dibaca</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- BERITA 16 -->
+      <article class="news-card fade-in" data-modal="modal16" data-category="Energi" data-date="2025-02-10">
+        <div class="news-card-header">
+          <img loading="lazy"
+            src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=600&h=400&q=80"
+            alt="Teknologi Hidrogel">
+          <button class="bookmark-btn" data-id="16">
+            <i class="far fa-bookmark"></i>
+          </button>
+          <span class="news-tag">Energi</span>
+        </div>
+        <div class="news-body">
+          <h3>Hidrogel Panas Bumi Konversi Energi 35% Lebih Efisien</h3>
+          <p>Teknologi hidrogel baru mampu konversi energi panas bumi jadi listrik dengan efisiensi tertinggi se-Asia Tenggara.</p>
+          <div class="news-meta">
+            <span>10 Februari 2025</span>
+            <span class="last-read" data-id="16">Belum dibaca</span>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </main>
+
+
+  <!-- LONG-FORM MODALS -->
+  <div id="modal1" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img src="https://images.unsplash.com/photo-1517430816045-df4b7de11d23?auto=format&fit=crop&w=900&h=600&q=80" alt="Gammaforce Drone">
+        <button class="modal-bookmark-btn" data-id="1">
+          <i class="far fa-bookmark"></i>
+        </button>
+        <button class="modal-reading-mode-btn" title="Mode Baca">
+          <i class="fas fa-book-open"></i>
+        </button>
+        <div class="close-modal">×</div>
+      </div>
+      <div class="modal-body">
+        <span class="modal-tag">AI & Robotika</span>
+        <h2>Gammaforce Juara Kontes Robot Terbang Indonesia 2025</h2>
+        <p>Tim mahasiswa dari <strong>Universitas Diponegoro (Undip)</strong> yang dikenal sebagai <strong>Gammaforce</strong> berhasil meraih gelar juara umum pada <strong>Kompetisi Robot Terbang Nasional (KRTI) 2025</strong> yang diselenggarakan di Bandung. Mereka mengembangkan drone cerdas berbasis AI yang mampu melakukan <strong>modifikasi cuaca mikro</strong> dengan menyemprotkan partikel higroskopis untuk mengurangi intensitas hujan di daerah rawan banjir.</p>
+        <p>Teknologi ini menggunakan kombinasi <strong>sensor cuaca real-time, computer vision, dan algoritma machine learning</strong> untuk memprediksi pola hujan dan menentukan titik penyemprotan optimal. Dalam uji coba di Semarang, drone berhasil menurunkan curah hujan hingga <strong>30% di area target</strong> tanpa mengganggu ekosistem sekitar. Sistem ini juga mampu beroperasi secara otonom selama 45 menit dengan jangkauan 5 km.</p>
+        <p>Pemerintah melalui <strong>BPBD Jawa Tengah</strong> berencana mengadopsi teknologi ini untuk penanggulangan banjir di <strong>12 kabupaten rawan bencana</strong> pada 2026. "Ini adalah bukti bahwa inovasi anak bangsa bisa menjawab tantangan nyata," ujar <strong>Prof. Dr. Budi Santoso</strong>, pembimbing tim. Drone ini juga dilengkapi dengan sistem <strong>anti-tabrakan berbasis LiDAR</strong> dan dapat dioperasikan secara swarm hingga 10 unit sekaligus.</p>
+        <p>Keberhasilan Gammaforce tidak lepas dari dukungan <strong>Kemenristekdikti</strong> dan <strong>PT Pindad</strong> yang menyediakan fasilitas pengujian. Drone ini dirancang dengan material ringan berbasis karbon fiber dan baterai lithium-sulfur yang mampu bertahan hingga <strong>2x lebih lama</strong> dari baterai konvensional. Proyek ini juga menjadi prototype untuk <strong>program nasional pengendalian banjir berbasis teknologi</strong>.</p>
+        <p>Saat ini, tim sedang mengembangkan versi komersial yang akan dipasarkan dengan harga <strong>Rp 750 juta per unit</strong>. Pemerintah daerah Jawa Barat dan DKI Jakarta telah menyatakan minat untuk mengintegrasikan teknologi ini ke dalam sistem <strong>smart city</strong>. Gammaforce juga diundang ke <strong>World Robot Summit 2026</strong> di Jepang sebagai perwakilan Indonesia.</p>
+      </div>
+      <div class="modal-navigation">
+        <button class="modal-nav-btn" id="prevBtn" disabled>
+          <i class="fas fa-arrow-left"></i> Berita Sebelumnya
+        </button>
+        <span class="modal-nav-info">Berita 1 dari 16</span>
+        <button class="modal-nav-btn" id="nextBtn">
+          Berita Selanjutnya <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal2" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img src="https://images.unsplash.com/photo-1676299081402-4c7c260e96a8?auto=format&fit=crop&w=900&h=600&q=80" alt="AI Otonom">
+        <button class="modal-bookmark-btn" data-id="2">
+          <i class="far fa-bookmark"></i>
+        </button>
+        <button class="modal-reading-mode-btn" title="Mode Baca">
+          <i class="fas fa-book-open"></i>
+        </button>
+        <div class="close-modal">×</div>
+      </div>
+      <div class="modal-body">
+        <span class="modal-tag">AI & Robotika</span>
+        <h2>5 Tren AI Otonom Dominasi Indonesia 2025</h2>
+        <p>Tahun 2025 menjadi titik balik adopsi <strong>AI otonom</strong> di Indonesia. <strong>Komputasi neuromorphic</strong> yang meniru cara kerja otak manusia mulai diterapkan di sektor manufaktur untuk meningkatkan efisiensi energi hingga <strong>40%</strong>. Teknologi ini memungkinkan chip AI bekerja dengan konsumsi daya <strong>100x lebih hemat</strong> dibandingkan GPU konvensional.</p>
+        <p>Sementara itu, <strong>AI tak terlihat (invisible AI)</strong> mulai mengotomatisasi layanan publik seperti pengurusan KTP, pajak, dan izin usaha. Startup lokal seperti <strong>Nodeflux</strong> dan <strong>Prosa.ai</strong> berhasil mengembangkan model AI berbahasa Indonesia yang mampu memproses data lokal dengan akurasi <strong>98%</strong>. Pemerintah menargetkan <strong>70% layanan publik berbasis AI</strong> pada akhir 2025.</p>
+        <p>Di sektor swasta, perusahaan logistik seperti <strong>J&T</strong> dan <strong>SiCepat</strong> menggunakan AI otonom untuk optimasi rute pengiriman, menghemat biaya operasional hingga <strong>Rp 2 triliun per tahun</strong> secara nasional. Sistem ini mampu memprediksi kemacetan, cuaca, dan permintaan pengiriman dengan akurasi <strong>95%</strong>.</p>
+        <p><strong>AI generatif berbasis bahasa daerah</strong> juga mulai dikembangkan. Model seperti <strong>"Bahasa Nusantara"</strong> mampu menerjemahkan 34 bahasa daerah secara real-time, membantu pelestarian budaya dan akses informasi di daerah terpencil. Program ini didukung oleh <strong>Kemdikbudristek</strong> dengan anggaran <strong>Rp 500 miliar</strong>.</p>
+        <p>Di bidang kesehatan, <strong>AI prediktif</strong> digunakan untuk memprediksi wabah penyakit dengan akurasi <strong>87%</strong>. Sistem ini telah membantu mencegah penyebaran demam berdarah di 15 kota besar. Tantangan utama adalah <strong>privasi data</strong> dan <strong>bias algoritma</strong>, yang sedang diatasi dengan regulasi <strong>UU Perlindungan Data Pribadi</strong>.</p>
+        <p>Pemerintah juga meluncurkan <strong>Indonesia AI Center</strong> di Batam dengan investasi <strong>Rp 3 triliun</strong> untuk pelatihan 100.000 talenta AI hingga 2030. Pusat ini akan menjadi hub riset AI terbesar di Asia Tenggara.</p>
+      </div>
+      <div class="modal-navigation">
+        <button class="modal-nav-btn" id="prevBtn">
+          <i class="fas fa-arrow-left"></i> Berita Sebelumnya
+        </button>
+        <span class="modal-nav-info">Berita 2 dari 16</span>
+        <button class="modal-nav-btn" id="nextBtn">
+          Berita Selanjutnya <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3–9: Long-Form (5–7 Paragraf) -->
+  <div id="modal3" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img src="https://images.unsplash.com/photo-1518770660439-24edd4c8784f?auto=format&fit=crop&w=900&h=600&q=80" alt="5G Indonesia">
+        <button class="modal-bookmark-btn" data-id="3">
+          <i class="far fa-bookmark"></i>
+        </button>
+        <button class="modal-reading-mode-btn" title="Mode Baca">
+          <i class="fas fa-book-open"></i>
+        </button>
+        <div class="close-modal">×</div>
+      </div>
+      <div class="modal-body">
+        <span class="modal-tag">Telekomunikasi</span>
+        <h2>Ekspansi 5G Ubah Komunikasi di Seluruh Indonesia</h2>
+        <p>Hingga akhir 2025, jaringan <strong>5G</strong> telah menjangkau <strong>80 kota besar dan 200 kabupaten</strong> di Indonesia. <strong>Telkomsel</strong> dan <strong>XL Axiata</strong> berhasil membangun lebih dari <strong>50.000 BTS 5G</strong>, dengan kecepatan rata-rata <strong>800 Mbps</strong> dan latensi di bawah <strong>5 ms</strong>.</p>
+        <p>Teknologi ini memungkinkan implementasi <strong>IoT skala besar</strong>, seperti <strong>smart meter listrik</strong> di 5 juta rumah tangga dan <strong>sistem pengairan pintar</strong> di sawah Jawa. Di sektor pendidikan, <strong>3.000 sekolah di daerah terpencil</strong> kini memiliki akses video conference stabil untuk e-learning.</p>
+        <p><strong>Industri 4.0</strong> juga mendapat dorongan besar. Pabrik-pabrik di Bekasi dan Karawang menggunakan <strong>5G private network</strong> untuk mengendalikan robot dan mesin secara real-time. Produktivitas meningkat <strong>35%</strong> dan biaya operasional turun <strong>22%</strong>.</p>
+        <p>Pemerintah melalui <strong>Kominfo</strong> menargetkan <strong>95% populasi terkoneksi 5G</strong> pada 2027, dengan investasi infrastruktur mencapai <strong>Rp 450 triliun</strong>. Program ini juga mencakup pelatihan <strong>50.000 teknisi 5G</strong> di seluruh Indonesia.</p>
+        <p>Di daerah terpencil, <strong>5G satelit</strong> mulai diuji coba di Papua dan Maluku. Teknologi ini memungkinkan akses internet di pulau-pulau kecil dengan biaya <strong>70% lebih murah</strong> dari satelit tradisional.</p>
+        <p>Tantangan utama adalah <strong>keamanan siber</strong>. Pemerintah meluncurkan <strong>National Cyber Defense Center</strong> untuk melindungi infrastruktur 5G dari serangan siber. Hingga kini, telah berhasil menggagalkan <strong>1.200 serangan DDoS</strong> per bulan.</p>
+      </div>
+      <div class="modal-navigation">
+        <button class="modal-nav-btn" id="prevBtn">
+          <i class="fas fa-arrow-left"></i> Berita Sebelumnya
+        </button>
+        <span class="modal-nav-info">Berita 3 dari 16</span>
+        <button class="modal-nav-btn" id="nextBtn">
+          Berita Selanjutnya <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal4" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img src="https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=900&h=600&q=80" alt="Halodoc AI">
+        <button class="modal-bookmark-btn" data-id="4">
+          <i class="far fa-bookmark"></i>
+        </button>
+        <button class="modal-reading-mode-btn" title="Mode Baca">
+          <i class="fas fa-book-open"></i>
+        </button>
+        <div class="close-modal">×</div>
+      </div>
+      <div class="modal-body">
+        <span class="modal-tag">Bioteknologi</span>
+        <h2>Bioteknologi Indonesia Maju: Diagnosa Cepat Berbasis AI</h2>
+        <p><strong>Halodoc</strong> bekerja sama dengan <strong>Kemenkes</strong> meluncurkan platform AI diagnosa berbasis biotek yang mampu mendeteksi <strong>50 jenis penyakit</strong> hanya dari foto lidah, mata, dan kulit. Akurasi mencapai <strong>92%</strong> untuk penyakit umum seperti diabetes, anemia, dan infeksi saluran pernapasan.</p>
+        <p>Teknologi ini telah digunakan di <strong>400 RSUD dan 1.200 puskesmas</strong>, mengurangi waktu diagnosa dari <strong>3 hari menjadi 30 menit</strong>. Biaya pemeriksaan turun <strong>65%</strong> bagi pasien BPJS. Sistem ini juga terintegrasi dengan <strong>rekam medis elektronik nasional</strong>.</p>
+        <p>Startup lain seperti <strong>Nalagenetics</strong> mengembangkan <strong>tes DNA lokal</strong> untuk pengobatan presisi kanker, dengan harga <strong>70% lebih murah</strong> dari impor. Tes ini mampu mendeteksi mutasi genetik penyebab kanker dalam <strong>24 jam</strong>.</p>
+        <p>Pemerintah meluncurkan <strong>Program Genom Indonesia</strong> untuk memetakan DNA 10 juta penduduk hingga 2030. Data ini akan digunakan untuk pengembangan obat dan vaksin yang disesuaikan dengan genetik masyarakat Indonesia.</p>
+        <p>Di bidang pertanian, <strong>bioteknologi pangan</strong> menghasilkan varietas padi tahan banjir dan garam. Produksi padi meningkat <strong>18%</strong> di lahan marginal. Teknologi CRISPR digunakan untuk mempercepat pengembangan varietas baru.</p>
+        <p>Tantangan utama adalah <strong>regulasi etik</strong> dan <strong>akses di daerah terpencil</strong>. Pemerintah sedang membangun <strong>100 laboratorium biotek mobile</strong> yang akan berkeliling ke desa-desa.</p>
+      </div>
+      <div class="modal-navigation">
+        <button class="modal-nav-btn" id="prevBtn">
+          <i class="fas fa-arrow-left"></i> Berita Sebelumnya
+        </button>
+        <span class="modal-nav-info">Berita 4 dari 16</span>
+        <button class="modal-nav-btn" id="nextBtn">
+          Berita Selanjutnya <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal5" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img src="https://images.unsplash.com/photo-1604948501466-1c8cbb76e4b9?auto=format&fit=crop&w=900&h=600&q=80" alt="PLTN Bangka">
+        <button class="modal-bookmark-btn" data-id="5">
+          <i class="far fa-bookmark"></i>
+        </button>
+        <button class="modal-reading-mode-btn" title="Mode Baca">
+          <i class="fas fa-book-open"></i>
+        </button>
+        <div class="close-modal">×</div>
+      </div>
+      <div class="modal-body">
+        <span class="modal-tag">Energi</span>
+        <h2>Energi Nuklir Dukung Kebutuhan AI di Indonesia 2025</h2>
+        <p><strong>Bappenas</strong> meresmikan pembangunan <strong>PLTN pertama</strong> di Pulau Bangka dengan kapasitas <strong>1.200 MW</strong>. Pembangkit ini khusus memasok listrik untuk <strong>15 data center AI nasional</strong> yang sedang dibangun di Batam, Cikarang, dan Bali.</p>
+        <p>Daya listrik stabil 24 jam diperlukan untuk pelatihan model AI besar. Saat ini, kebutuhan listrik data center AI Indonesia mencapai <strong>3 GW</strong> dan diproyeksi naik <strong>300%</strong> pada 2030. PLTN ini menggunakan <strong>teknologi reaktor modular kecil (SMR)</strong> dari ThorCon dengan tingkat keamanan <strong>1.000 kali lebih baik</strong> dari PLTN konvensional.</p>
+        <p>Pembangkit ini juga akan memasok listrik untuk <strong>industri semikonduktor</strong> di Batam. Investasi total mencapai <strong>Rp 25 triliun</strong> dengan 60% komponen lokal. Tenaga kerja yang terlibat mencapai <strong>8.000 orang</strong> selama konstruksi.</p>
+        <p>Pemerintah menargetkan <strong>5 GW energi nuklir</strong> pada 2035 untuk mendukung <strong>net zero emission 2060</strong>. Teknologi thorium yang digunakan menghasilkan limbah radioaktif <strong>90% lebih sedikit</strong> dan tidak dapat digunakan untuk senjata nuklir.</p>
+        <p>Program pendidikan nuklir juga diperluas. <strong>Universitas Gadjah Mada</strong> dan <strong>ITB</strong> membuka program S2 Teknik Nuklir dengan beasiswa penuh untuk <strong>500 mahasiswa per tahun</strong>. Masyarakat lokal Bangka Belitung diberikan pelatihan khusus untuk bekerja di PLTN.</p>
+        <p>Tantangan utama adalah <strong>persepsi masyarakat</strong>. Pemerintah meluncurkan kampanye edukasi nasional dengan simulasi VR untuk menjelaskan keamanan PLTN. Hingga kini, <strong>78% masyarakat mendukung</strong> pembangunan PLTN setelah edukasi.</p>
+      </div>
+      <div class="modal-navigation">
+        <button class="modal-nav-btn" id="prevBtn">
+          <i class="fas fa-arrow-left"></i> Berita Sebelumnya
+        </button>
+        <span class="modal-nav-info">Berita 5 dari 16</span>
+        <button class="modal-nav-btn" id="nextBtn">
+          Berita Selanjutnya <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+    <div id="modal6" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img src="https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?auto=format&fit=crop&w=900&h=600&q=80" alt="Tesla Optimus">
+        <button class="modal-bookmark-btn" data-id="6">
+          <i class="far fa-bookmark"></i>
+        </button>
+        <button class="modal-reading-mode-btn" title="Mode Baca">
+          <i class="fas fa-book-open"></i>
+        </button>
+        <div class="close-modal">×</div>
+      </div>
+      <div class="modal-body">
+        <span class="modal-tag">AI & Robotika</span>
+        <h2>Tesla Optimus Masuk Pasar Indonesia via Kerja Sama Lokal</h2>
+        <p><strong>Tesla</strong> menggandeng <strong>Gojek</strong> dan <strong>Astra</strong> untuk memproduksi robot humanoid <strong>Optimus</strong> di Indonesia. Pabrik perakitan di Bandung mulai beroperasi akhir 2025 dengan kapasitas <strong>5.000 unit/tahun</strong>. Investasi awal mencapai <strong>Rp 4 triliun</strong>.</p>
+        <p>Optimus digunakan untuk otomatisasi gudang, pengiriman last-mile, dan bantuan medis di rumah sakit. Dalam uji coba, efisiensi logistik meningkat <strong>45%</strong> dan biaya operasional turun <strong>32%</strong>. Robot ini mampu mengangkat beban hingga <strong>20 kg</strong> dan berjalan dengan kecepatan <strong>8 km/jam</strong>.</p>
+        <p>Harga jual diperkirakan <strong>Rp 350 juta per unit</strong>, dengan <strong>60% komponen produksi lokal</strong>. Pemerintah memberikan insentif pajak <strong>50%</strong> untuk pembelian robot buatan Indonesia. <strong>10.000 unit</strong> ditargetkan terjual hingga 2028.</p>
+        <p>Di sektor kesehatan, Optimus digunakan sebagai asisten perawat di <strong>50 rumah sakit</strong>. Robot ini mampu membaca ekspresi wajah pasien, mengukur tanda vital, dan memanggil dokter secara otomatis. Tingkat kepuasan pasien meningkat <strong>40%</strong>.</p>
+        <p>Program pelatihan teknisi robot juga diluncurkan. <strong>Politeknik Manufaktur Bandung</strong> membuka jurusan Robotika Industri dengan kuota <strong>1.000 mahasiswa per tahun</strong>. Lulusan dijamin bekerja di pabrik Tesla atau mitra lokal.</p>
+        <p>Tantangan utama adalah <strong>keamanan dan etika</strong>. Pemerintah sedang menyusun <strong>UU Robotika</strong> yang mengatur penggunaan robot di tempat umum. Tesla juga meluncurkan fitur <strong>"Mode Etika"</strong> yang membatasi gerakan robot di area sensitif.</p>
+      </div>
+      <div class="modal-navigation">
+        <button class="modal-nav-btn" id="prevBtn">
+          <i class="fas fa-arrow-left"></i> Berita Sebelumnya
+        </button>
+        <span class="modal-nav-info">Berita 6 dari 16</span>
+        <button class="modal-nav-btn" id="nextBtn">
+          Berita Selanjutnya <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal7" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=900&h=600&q=80" alt="Satelit Nusantara">
+        <button class="modal-bookmark-btn" data-id="7">
+          <i class="far fa-bookmark"></i>
+        </button>
+        <button class="modal-reading-mode-btn" title="Mode Baca">
+          <i class="fas fa-book-open"></i>
+        </button>
+        <div class="close-modal">×</div>
+      </div>
+      <div class="modal-body">
+        <span class="modal-tag">Telekomunikasi</span>
+        <h2>Satelit Nusantara 5 Sukses Diluncurkan, Internet 100 Mbps ke Pelosok</h2>
+        <p><strong>PSN</strong> dan <strong>SpaceX</strong> meluncurkan satelit GEO <strong>Nusantara 5</strong> dari Cape Canaveral. Satelit ini menyediakan internet <strong>100 Mbps</strong> ke <strong>17.000 desa terpencil</strong> di Papua, Kalimantan, dan Nusa Tenggara. Biaya produksi satelit mencapai <strong>Rp 3,5 triliun</strong>.</p>
+        <p>Program ini mendukung <strong>2 juta siswa</strong> untuk e-learning dan <strong>500.000 UMKM</strong> untuk go digital. Biaya langganan hanya <strong>Rp 150.000/bulan</strong> dengan perangkat gratis. Kecepatan upload mencapai <strong>20 Mbps</strong>, cukup untuk video conference dan streaming.</p>
+        <p>Teknologi <strong>beamforming</strong> memungkinkan satelit fokus ke area tertentu dengan efisiensi <strong>300% lebih baik</strong>. Satelit ini juga dilengkapi dengan <strong>AI onboard</strong> untuk manajemen bandwidth otomatis berdasarkan kebutuhan pengguna.</p>
+        <p>Pemerintah menargetkan <strong>100% desa terkoneksi internet</strong> pada 2027. Program ini juga mencakup pembangunan <strong>5.000 menara BTS</strong> di daerah 3T (Terdepan, Terluar, Tertinggal). Total investasi mencapai <strong>Rp 12 triliun</strong>.</p>
+        <p>Di sektor pertanian, petani di Papua menggunakan internet satelit untuk <strong>monitoring tanaman</strong> dengan drone dan sensor IoT. Hasil panen meningkat <strong>25%</strong> berkat prediksi cuaca dan hama yang akurat.</p>
+        <p>Tantangan utama adalah <strong>cuaca ekstrem</strong>. Satelit ini dirancang tahan terhadap badai tropis dengan sistem <strong>redundansi ganda</strong>. Umur operasional satelit diperkirakan <strong>18 tahun</strong>.</p>
+      </div>
+      <div class="modal-navigation">
+        <button class="modal-nav-btn" id="prevBtn">
+          <i class="fas fa-arrow-left"></i> Berita Sebelumnya
+        </button>
+        <span class="modal-nav-info">Berita 7 dari 16</span>
+        <button class="modal-nav-btn" id="nextBtn">
+          Berita Selanjutnya <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal8" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img src="https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?auto=format&fit=crop&w=900&h=600&q=80" alt="EV Otonom IKN">
+        <button class="modal-bookmark-btn" data-id="8">
+          <i class="far fa-bookmark"></i>
+        </button>
+        <button class="modal-reading-mode-btn" title="Mode Baca">
+          <i class="fas fa-book-open"></i>
+        </button>
+        <div class="close-modal">×</div>
+      </div>
+      <div class="modal-body">
+        <span class="modal-tag">Transportasi</span>
+        <h2>IKN Nusantara Uji Coba Kendaraan Listrik Otonom 100 Unit</h2>
+        <p><strong>IKN</strong> mengoperasikan <strong>100 unit kendaraan listrik otonom</strong> produksi <strong>BYD</strong> dan <strong>UI</strong>. Kendaraan ini menggunakan <strong>AI lokal</strong> untuk navigasi, deteksi pejalan kaki, dan manajemen lalu lintas. Sistem ini terintegrasi dengan <strong>smart city IKN</strong>.</p>
+        <p>Kendaraan ini mampu mengurangi kemacetan <strong>60%</strong> dan emisi karbon <strong>90%</strong>. Kecepatan operasional <strong>40 km/jam</strong> dengan jangkauan <strong>200 km per charge</strong>. Baterai dapat diisi ulang dalam <strong>30 menit</strong> dengan teknologi fast charging.</p>
+        <p>Sistem <strong>V2X (Vehicle-to-Everything)</strong> memungkinkan kendaraan berkomunikasi dengan lampu lalu lintas, pejalan kaki, dan kendaraan lain. Tingkat kecelakaan turun <strong>95%</strong> dibandingkan kendaraan manual.</p>
+        <p>Pada 2026, jumlah armada akan ditingkatkan menjadi <strong>1.000 unit</strong>. Pemerintah juga merencanakan <strong>jaringan charging station</strong> di seluruh IKN dengan kapasitas <strong>500 MW</strong>. Energi berasal dari PLTS dan PLTA.</p>
+        <p>Program ini juga melibatkan <strong>pelatihan 2.000 teknisi EV</strong> dari masyarakat lokal. <strong>Politeknik IKN</strong> membuka jurusan Teknik Kendaraan Listrik dengan kurikulum berbasis industri.</p>
+        <p>Tantangan utama adalah <strong>infrastruktur jalan</strong>. Pemerintah sedang membangun <strong>smart road</strong> dengan sensor tertanam untuk mendukung kendaraan otonom. Proyek ini dijadwalkan selesai pada 2027.</p>
+      </div>
+      <div class="modal-navigation">
+        <button class="modal-nav-btn" id="prevBtn">
+          <i class="fas fa-arrow-left"></i> Berita Sebelumnya
+        </button>
+        <span class="modal-nav-info">Berita 8 dari 16</span>
+        <button class="modal-nav-btn" id="nextBtn">
+          Berita Selanjutnya <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal9" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img src="https://images.unsplash.com/photo-1620712943544-b9d7a14f0d9e?auto=format&fit=crop&w=900&h=600&q=80" alt="Blockchain Tanah">
+        <button class="modal-bookmark-btn" data-id="9">
+          <i class="far fa-bookmark"></i>
+        </button>
+        <button class="modal-reading-mode-btn" title="Mode Baca">
+          <i class="fas fa-book-open"></i>
+        </button>
+        <div class="close-modal">×</div>
+      </div>
+      <div class="modal-body">
+        <span class="modal-tag">Blockchain</span>
+        <h2>Blockchain Nasional: 10 Juta Sertifikat Tanah Digital Terbit 2025</h2>
+        <p><strong>Kementerian ATR/BPN</strong> meluncurkan sistem <strong>blockchain nasional</strong> berbasis Ethereum untuk penerbitan sertifikat tanah digital. Hingga akhir 2025, <strong>10 juta bidang tanah</strong> telah teregister. Sistem ini mencegah pemalsuan, duplikasi, dan mafia tanah.</p>
+        <p>Setiap transaksi tercatat secara permanen dan transparan. Waktu pengurusan sertifikat turun dari <strong>6 bulan menjadi 7 hari</strong>. Biaya administrasi turun <strong>80%</strong>. Masyarakat dapat mengakses data melalui aplikasi <strong>"Tanahku"</strong>.</p>
+        <p>Program ini didukung <strong>Bank Dunia</strong> dengan anggaran <strong>Rp 1,2 triliun</strong>. Teknologi <strong>smart contract</strong> digunakan untuk otomatisasi proses jual beli tanah. Notaris digital juga mulai diterapkan di <strong>50 kota</strong>.</p>
+        <p>Di daerah rawan konflik, blockchain membantu menyelesaikan <strong>5.000 sengketa tanah</strong> dengan bukti digital yang tidak dapat dipalsukan. Tingkat kepuasan masyarakat meningkat <strong>85%</strong>.</p>
+        <p>Pemerintah menargetkan <strong>83 juta bidang tanah</strong> teregister pada 2030. Program ini juga mencakup <strong>pemetaan 3D</strong> dengan drone dan satelit. Akurasi batas tanah mencapai <strong>99,9%</strong>.</p>
+        <p>Tantangan utama adalah <strong>literasi digital</strong>. Pemerintah meluncurkan program <strong>"Desa Digital"</strong> untuk melatih <strong>1 juta kader desa</strong> dalam penggunaan teknologi blockchain. Hingga kini, <strong>12.000 desa</strong> telah tersertifikasi digital.</p>
+      </div>
+      <div class="modal-navigation">
+        <button class="modal-nav-btn" id="prevBtn">
+          <i class="fas fa-arrow-left"></i> Berita Sebelumnya
+        </button>
+        <span class="modal-nav-info">Berita 9 dari 16</span>
+        <button class="modal-nav-btn" id="nextBtn">
+          Berita Selanjutnya <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 10-16: Berita Baru -->
+  <div id="modal10" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=900&h=600&q=80" alt="Quantum Computing">
+        <button class="modal-bookmark-btn" data-id="10">
+          <i class="far fa-bookmark"></i>
+        </button>
+        <button class="modal-reading-mode-btn" title="Mode Baca">
+          <i class="fas fa-book-open"></i>
+        </button>
+        <div class="close-modal">×</div>
+      </div>
+      <div class="modal-body">
+        <span class="modal-tag">Quantum Computing</span>
+        <h2>Quantum Computing Indonesia Uji Coba Prosesor 50-Qubit</h2>
+        <p><strong>Bandung Tech Park</strong> resmi memulai uji coba prosesor kuantum <strong>50-qubit pertama Indonesia</strong> dengan investasi sebesar <strong>Rp 2 triliun</strong>. Prosesor ini dikembangkan oleh konsorsium <strong>Quantum Indonesia</strong> yang terdiri dari peneliti ITB, UI, dan UGM.</p>
+        <p>Prosesor kuantum ini mampu menyelesaikan perhitungan kompleks yang sebelumnya membutuhkan waktu <strong>10.000 tahun</strong> menjadi hanya <strong>200 detik</strong>. Teknologi ini akan digunakan untuk simulasi molekul obat, optimasi logistik nasional, dan prediksi cuaca jangka panjang.</p>
+        <p>Suhu operasional prosesor dijaga pada <strong>-273°C</strong> menggunakan sistem pendingin helium cair. Sistem ini diklaim <strong>40% lebih efisien</strong> dibandingkan teknologi kuantum komersial lainnya. Tim peneliti Indonesia berhasil mengembangkan algoritma koreksi error yang mengurangi noise kuantum hingga <strong>85%</strong>.</p>
+        <p>Pemerintah menargetkan Indonesia menjadi <strong>hub quantum computing Asia Tenggara</strong> pada 2030. Program pelatihan quantum computing telah dimulai di <strong>15 universitas</strong> dengan kuota <strong>2.000 mahasiswa</strong> per tahun. Beasiswa penuh disediakan untuk program S2 dan S3 di bidang fisika kuantum.</p>
+        <p>Industri farmasi nasional menjadi pengguna pertama teknologi ini. <strong>PT Kalbe Farma</strong> menggunakan quantum computing untuk simulasi <strong>1.000 senyawa obat potensial</strong> dalam waktu seminggu, mempercepat pengembangan obat baru hingga <strong>70%</strong>.</p>
+        <p>Tantangan utama adalah <strong>ketersediaan talenta</strong> dan <strong>infrastruktur pendukung</strong>. Pemerintah sedang membangun <strong>Quantum Data Center</strong> di Jakarta dan Surabaya dengan kapasitas total <strong>50 MW</strong>.</p>
+      </div>
+      <div class="modal-navigation">
+        <button class="modal-nav-btn" id="prevBtn">
+          <i class="fas fa-arrow-left"></i> Berita Sebelumnya
+        </button>
+        <span class="modal-nav-info">Berita 10 dari 16</span>
+        <button class="modal-nav-btn" id="nextBtn">
+          Berita Selanjutnya <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal11" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img src="https://images.unsplash.com/photo-1622630998477-20aa696ec863?auto=format&fit=crop&w=900&h=600&q=80" alt="Regulasi Kripto">
+        <button class="modal-bookmark-btn" data-id="11">
+          <i class="far fa-bookmark"></i>
+        </button>
+        <button class="modal-reading-mode-btn" title="Mode Baca">
+          <i class="fas fa-book-open"></i>
+        </button>
+        <div class="close-modal">×</div>
+      </div>
+      <div class="modal-body">
+        <span class="modal-tag">Blockchain</span>
+        <h2>ASEAN Setujui Regulasi Kripto Terpadu 2025</h2>
+        <p><strong>ASEAN Financial Ministers Meeting</strong> menyepakati <strong>kerangka regulasi aset kripto terpadu</strong> yang akan berlaku efektif mulai <strong>1 Januari 2025</strong>. Regulasi ini menstandarisasi perdagangan, perlindungan investor, dan anti-pencucian uang di seluruh negara anggota ASEAN.</p>
+        <p>Regulasi baru mengharuskan semua platform kripto memiliki <strong>modal minimum US$10 juta</strong> dan <strong>lisensi operasi dari otoritas masing-masing negara</strong>. Perlindungan investor ditingkatkan dengan mewajibkan <strong>cold storage 95%</strong> untuk aset digital dan <strong>asuransi kerugian</strong> hingga US$500.000 per pengguna.</p>
+        <p>Indonesia ditunjuk sebagai <strong>ASEAN Crypto Hub</strong> dengan pembangunan <strong>Digital Asset Exchange</strong> di Jakarta. Bursa ini akan terintegrasi dengan <strong>7 negara ASEAN lainnya</strong> dan mendukung perdagangan <strong>24/7</strong> dengan volume harian diperkirakan mencapai <strong>US$5 miliar</strong>.</p>
+        <p>Regulasi ini juga mengatur <strong>pajak transaksi kripto</strong> sebesar <strong>0.1%</strong> yang akan dialokasikan untuk <strong>ASEAN Digital Innovation Fund</strong>. Dana ini digunakan untuk pengembangan blockchain, edukasi publik, dan riset teknologi finansial di kawasan.</p>
+        <p>Perusahaan fintech Indonesia seperti <strong>Tokocrypto</strong> dan <strong>Pintu</strong> diproyeksikan mengalami pertumbuhan <strong>300%</strong> setelah implementasi regulasi. Lebih dari <strong>5 juta investor ritel baru</strong> diperkirakan masuk pasar kripto ASEAN pada 2026.</p>
+        <p>Tantangan implementasi adalah <strong>harmonisasi regulasi antar negara</strong> dan <strong>edukasi masyarakat</strong>. ASEAN membentuk <strong>Crypto Education Task Force</strong> dengan anggaran <strong>US$50 juta</strong> untuk program literasi digital di 10 negara anggota.</p>
+      </div>
+      <div class="modal-navigation">
+        <button class="modal-nav-btn" id="prevBtn">
+          <i class="fas fa-arrow-left"></i> Berita Sebelumnya
+        </button>
+        <span class="modal-nav-info">Berita 11 dari 16</span>
+        <button class="modal-nav-btn" id="nextBtn">
+          Berita Selanjutnya <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal12" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img src="https://images.unsplash.com/photo-1558618666-fcd25856cd63?auto=format&fit=crop&w=900&h=600&q=80" alt="Augmented Reality">
+        <button class="modal-bookmark-btn" data-id="12">
+          <i class="far fa-bookmark"></i>
+        </button>
+        <button class="modal-reading-mode-btn" title="Mode Baca">
+          <i class="fas fa-book-open"></i>
+        </button>
+        <div class="close-modal">×</div>
+      </div>
+      <div class="modal-body">
+        <span class="modal-tag">AI & Robotika</span>
+        <h2>Smart Glasses AR dengan Neural Interface Diluncurkan</h2>
+        <p>Startup Indonesia <strong>SightTech</strong> meluncurkan smart glasses <strong>Augma Pro</strong> dengan <strong>neural interface</strong> pertama di dunia yang mampu dikontrol melalui gerakan mata dan gelombang otak. Produk ini dikembangkan dengan investasi <strong>Rp 1.5 triliun</strong> dari venture capital global.</p>
+        <p>Augma Pro menggunakan <strong>12 sensor EMG</strong> untuk mendeteksi sinyal otot sekitar mata dan <strong>EEG dry electrodes</strong> untuk membaca gelombang otak. Sistem ini mampu mengenali <strong>8 perintah gerakan mata</strong> dan <strong>5 pola gelombang otak</strong> dengan akurasi <strong>99.7%</strong>.</p>
+        <p>Smart glasses ini menampilkan informasi AR langsung ke retina dengan resolusi <strong>8K per mata</strong> và field of view <strong>120 derajat</strong>. Baterai mampu bertahan <strong>18 jam</strong> untuk penggunaan normal và <strong>6 jam</strong> untuk mode AR intensif. Berat total hanya <strong>45 gram</strong>.</p>
+        <p>Di sektor kesehatan, Augma Pro digunakan untuk terapi <strong>low vision</strong> và <strong>rehabilitasi stroke</strong>. Di industri, teknisi menggunakan smart glasses untuk <strong>remote assistance</strong> và <strong>prosedur perakitan kompleks</strong>. Produktivitas meningkat <strong>35%</strong> di pabrik otomotif.</p>
+        <p>Harga retail ditetapkan <strong>Rp 25 juta</strong> dengan <strong>30.000 unit pre-order</strong> dalam 24 jam pertama. SightTech menargetkan produksi <strong>100.000 unit</strong> pada 2026 và ekspor ke <strong>15 negara</strong> di Asia Pasifik.</p>
+        <p>Tantangan utama adalah <strong>regulasi kesehatan</strong> và <strong>privasi data neural</strong>. Pemerintah sedang menyusun <strong>UU Perlindungan Data Biometrik</strong> yang akan melindungi data pengguna dari penyalahgunaan.</p>
+      </div>
+      <div class="modal-navigation">
+        <button class="modal-nav-btn" id="prevBtn">
+          <i class="fas fa-arrow-left"></i> Berita Sebelumnya
+        </button>
+        <span class="modal-nav-info">Berita 12 dari 16</span>
+        <button class="modal-nav-btn" id="nextBtn">
+          Berita Selanjutnya <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  
+  <div id="modal13" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img src="https://images.unsplash.com/photo-1586771107445-d3ca888129db?auto=format&fit=crop&w=900&h=600&q=80" alt="Pertanian Presisi">
+        <button class="modal-bookmark-btn" data-id="13">
+          <i class="far fa-bookmark"></i>
+        </button>
+        <button class="modal-reading-mode-btn" title="Mode Baca">
+          <i class="fas fa-book-open"></i>
+        </button>
+        <div class="close-modal">×</div>
+      </div>
+      <div class="modal-body">
+        <span class="modal-tag">AI & Robotika</span>
+        <h2>AI dan Drone Tingkatkan Hasil Panen hingga 40%</h2>
+        <p>Implementasi <strong>teknologi pertanian presisi</strong> berbasis AI và drone berhasil meningkatkan hasil panen rata-rata <strong>40%</strong> di <strong>5.000 hektar lahan percontohan</strong> di Jawa Tengah và Jawa Timur. Program ini merupakan kolaborasi <strong>Kementan</strong> dengan <strong>AgriTech Indonesia</strong>.</p>
+        <p>Drone khusus pertanian dilengkapi dengan <strong>multispectral sensor</strong> và <strong>AI image recognition</strong> mampu memetakan kesehatan tanaman, mendeteksi hama, và mengoptimalkan irigasi. Sistem ini mengurangi penggunaan pestisida hingga <strong>60%</strong> dan air hingga <strong>45%</strong>.</p>
+        <p>AI menganalisis data <strong>soil moisture, cuaca, và pertumbuhan tanaman</strong> untuk memberikan rekomendasi pemupukan dan penyiraman yang tepat. Petani menerima notifikasi real-time melalui aplikasi <strong>"SmartFarm"</strong> yang telah digunakan oleh <strong>50.000 petani</strong>.</p>
+        <p>Di Subang, teknologi ini membantu petani bawang merah meningkatkan produktivitas dari <strong>10 ton/hektar menjadi 14 ton/hektar</strong>. Di Klaten, petani padi berhasil menghemat biaya produksi <strong>Rp 2,5 juta/hektar</strong> sekaligus meningkatkan hasil panen <strong>35%</strong>.</p>
+        <p>Pemerintah menargetkan <strong>1 juta hektar lahan</strong> menggunakan teknologi pertanian presisi pada 2027. Program subsidi drone pertanian disediakan dengan anggaran <strong>Rp 500 miliar</strong> per tahun. Pelatihan teknologi pertanian modern telah menjangkau <strong>100.000 petani</strong>.</p>
+        <p>Tantangan utama adalah <strong>adaptasi petani</strong> và <strong>infrastruktur digital di pedesaan</strong>. Pemerintah membangun <strong>1.000 menara komunikasi</strong> dan menyediakan <strong>internet subsidi</strong> untuk daerah pertanian terpencil.</p>
+      </div>
+      <div class="modal-navigation">
+        <button class="modal-nav-btn" id="prevBtn">
+          <i class="fas fa-arrow-left"></i> Berita Sebelumnya
+        </button>
+        <span class="modal-nav-info">Berita 13 dari 16</span>
+        <button class="modal-nav-btn" id="nextBtn">
+          Berita Selanjutnya <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal14" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img src="https://images.unsplash.com/photo-1648613342732-45020f5c4f0e?auto=format&fit=crop&w=900&h=600&q=80" alt="Baterai Solid-State">
+        <button class="modal-bookmark-btn" data-id="14">
+          <i class="far fa-bookmark"></i>
+        </button>
+        <button class="modal-reading-mode-btn" title="Mode Baca">
+          <i class="fas fa-book-open"></i>
+        </button>
+        <div class="close-modal">×</div>
+      </div>
+      <div class="modal-body">
+        <span class="modal-tag">Energi</span>
+        <h2>Baterai Solid-State Nasional Siap Diproduksi Massal</h2>
+        <p><strong>Lembaga Ilmu Pengetahuan Indonesia (LIPI)</strong> berhasil mengembangkan baterai solid-state pertama Indonesia dengan kapasitas <strong>500 Wh/kg</strong> và siap diproduksi massal pada <strong>kuartal III 2025</strong>. Teknologi ini menggunakan <strong>elektrolit keramik</strong> buatan lokal.</p>
+        <p>Baterai solid-state memiliki <strong>keamanan lebih tinggi</strong> karena tidak menggunakan cairan elektrolit yang mudah terbakar. Masa pakai mencapai <strong>2.000 siklus charge-discharge</strong> dengan degradasi kapasitas hanya <strong>5%</strong>. Waktu charging hanya <strong>12 menit</strong> untuk kapasitas 0-80%.</p>
+        <p>Pabrik baterai dibangun di <strong>Batam</strong> dengan kapasitas produksi <strong>1 GWh/tahun</strong> pada fase pertama. Investasi mencapai <strong>Rp 3,5 triliun</strong> dari konsorsium BUMN dan swasta. Pabrik ini akan menyerap <strong>2.000 tenaga kerja</strong> lokal.</p>
+        <p>Baterai ini akan digunakan untuk <strong>kendaraan listrik nasional</strong> dan <strong>penyimpanan energi terbarukan</strong>. Untuk mobil listrik, jarak tempuh meningkat menjadi <strong>800 km per charge</strong>. Untuk PLTS, efisiensi penyimpanan meningkat menjadi <strong>98%</strong>.</p>
+        <p>LIPI juga mengembangkan <strong>baterai second life</strong> untuk aplikasi stationary setelah masa pakai kendaraan berakhir. Program daur ulang baterai mencapai efisiensi <strong>95%</strong> dalam memulihkan material berharga seperti lithium và kobalt.</p>
+        <p>Tantangan utama adalah <strong>supply chain material mentah</strong> và <strong>skalabilitas produksi</strong>. Pemerintah sedang mengembangkan <strong>industri hulu baterai</strong> di Morowali dengan investasi <strong>Rp 25 triliun</strong>.</p>
+      </div>
+      <div class="modal-navigation">
+        <button class="modal-nav-btn" id="prevBtn">
+          <i class="fas fa-arrow-left"></i> Berita Sebelumnya
+        </button>
+        <span class="modal-nav-info">Berita 14 dari 16</span>
+        <button class="modal-nav-btn" id="nextBtn">
+          Berita Selanjutnya <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal15" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=900&h=600&q=80" alt="Keamanan Siber">
+        <button class="modal-bookmark-btn" data-id="15">
+          <i class="far fa-bookmark"></i>
+        </button>
+        <button class="modal-reading-mode-btn" title="Mode Baca">
+          <i class="fas fa-book-open"></i>
+        </button>
+        <div class="close-modal">×</div>
+      </div>
+      <div class="modal-body">
+        <span class="modal-tag">AI & Robotika</span>
+        <h2>AI CyberGuard Deteksi 10.000 Serangan Siber per Detik</h2>
+        <p>Sistem keamanan siber <strong>CyberGuard AI</strong> yang dikembangkan <strong>BSSN</strong> berhasil mendeteksi và menetralisasi <strong>10.000 serangan siber per detik</strong> dengan akurasi <strong>99.9%</strong>. Sistem ini menggunakan <strong>deep learning</strong> và <strong>behavioral analysis</strong> untuk identifikasi ancaman.</p>
+        <p>CyberGuard mampu mencegah <strong>ransomware, DDoS, dan APT attacks</strong> secara real-time. Sistem ini telah melindungi <strong>infrastruktur kritis nasional</strong> termasuk perbankan, energi, dan transportasi. Tingkat false positive hanya <strong>0.01%</strong>, terendah di dunia.</p>
+        <p>Di sektor perbankan, CyberGuard berhasil mencegah <strong>1.200 upaya penipuan digital</strong> dengan nilai potensial <strong>Rp 450 miliar</strong> dalam 3 bulan. Sistem ini terintegrasi dengan <strong>157 bank</strong> dan <strong>2.500 fintech</strong> di Indonesia.</p>
+        <p>Teknologi ini menggunakan <strong>quantum-resistant cryptography</strong> yang aman terhadap serangan komputer kuantum masa depan. Sistem update otomatis dilakukan setiap <strong>15 menit</strong> dengan database <strong>5 miliar signature ancaman</strong> dari seluruh dunia.</p>
+        <p>BSSN menawarkan CyberGuard sebagai <strong>layanan keamanan siber untuk ASEAN</strong>. Hingga kini, <strong>5 negara ASEAN</strong> telah mengadopsi teknologi ini dengan kontrak nilai <strong>US$200 juta</strong>. Ekspor teknologi keamanan siber ditargetkan menjadi <strong>US$1 miliar</strong> pada 2028.</p>
+        <p>Tantangan utama adalah <strong>serangan AI-powered</strong> và <strong>ketersediaan talenta</strong>. BSSN membuka <strong>National Cyber Security Academy</strong> dengan kapasitas <strong>5.000 siswa</strong> per tahun untuk mencetak ahli keamanan siber.</p>
+      </div>
+      <div class="modal-navigation">
+        <button class="modal-nav-btn" id="prevBtn">
+          <i class="fas fa-arrow-left"></i> Berita Sebelumnya
+        </button>
+        <span class="modal-nav-info">Berita 15 dari 16</span>
+        <button class="modal-nav-btn" id="nextBtn">
+          Berita Selanjutnya <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal16" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=900&h=600&q=80" alt="Teknologi Hidrogel">
+        <button class="modal-bookmark-btn" data-id="16">
+          <i class="far fa-bookmark"></i>
+        </button>
+        <button class="modal-reading-mode-btn" title="Mode Baca">
+          <i class="fas fa-book-open"></i>
+        </button>
+        <div class="close-modal">×</div>
+      </div>
+      <div class="modal-body">
+        <span class="modal-tag">Energi</span>
+        <h2>Hidrogel Panas Bumi Konversi Energi 35% Lebih Efisien</h2>
+        <p>Peneliti <strong>Universitas Indonesia</strong> berhasil mengembangkan teknologi <strong>hidrogel panas bumi</strong> yang mampu mengkonversi energi panas menjadi listrik dengan efisiensi <strong>35% lebih tinggi</strong> dari teknologi konvensional. Inovasi ini menggunakan <strong>nanomaterial graphene</strong> và <strong>polimer termoresponsif</strong>.</p>
+        <p>Hidrogel ini bekerja pada suhu <strong>80-150°C</strong>, lebih rendah dari pembangkit panas bumi konvensional yang membutuhkan suhu <strong>200°C</strong>. Hal ini memungkinkan pemanfaatan <strong>sumber panas bumi rendah enthalpy</strong> yang melimpah di Indonesia tetapi belum termanfaatkan.</p>
+        <p>Prototype berkapasitas <strong>1 MW</strong> telah beroperasi di <strong>Lapangan Ulubelu, Lampung</strong> dengan biaya produksi listrik hanya <strong>Rp 650/kWh</strong>, <strong>40% lebih murah</strong> dari PLTP konvensional. Teknologi ini tidak memerlukan <strong>fluida kerja</strong> seperti pada sistem binary cycle.</p>
+        <p>Pemerintah menargetkan pembangunan <strong>50 PLTP hidrogel</strong> dengan total kapasitas <strong>500 MW</strong> pada 2028. Investasi yang dibutuhkan <strong>Rp 15 triliun</strong> dengan ROI diperkirakan <strong>5 tahun</strong>. Teknologi ini akan membuka <strong>120 lapangan panas bumi baru</strong> yang sebelumnya tidak ekonomis.</p>
+        <p>Hidrogel juga dapat digunakan untuk <strong>cogeneration</strong> menghasilkan listrik và air panas secara simultan. Aplikasi di <strong>industri tekstil</strong> và <strong>pengolahan makanan</strong> mampu menghemat biaya energi hingga <strong>60%</strong>.</p>
+        <p>Tantangan utama adalah <strong>durabilitas material</strong> và <strong>skalabilitas teknologi</strong>. Tim peneliti UI sedang mengembangkan hidrogel generasi kedua dengan masa pakai <strong>10 tahun</strong> và efisiensi <strong>45%</strong>.</p>
+      </div>
+      <div class="modal-navigation">
+        <button class="modal-nav-btn" id="prevBtn">
+          <i class="fas fa-arrow-left"></i> Berita Sebelumnya
+        </button>
+        <span class="modal-nav-info">Berita 16 dari 16</span>
+        <button class="modal-nav-btn" id="nextBtn" disabled>
+          Berita Selanjutnya <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Side Panels for Bookmarks & History -->
+  <div class="side-panel" id="bookmarksPanel">
+    <div class="side-panel-header">
+      <h3>Bookmarks Saya</h3>
+      <div class="panel-controls">
+        <button class="panel-control-btn" id="clearAllBookmarks" title="Hapus Semua">
+          <i class="fas fa-trash"></i>
+        </button>
+        <button class="close-panel">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+    <div class="side-panel-content" id="bookmarksContent">
+      <!-- Content will be populated by JavaScript -->
+    </div>
+  </div>
+  
+  <div class="side-panel" id="historyPanel">
+    <div class="side-panel-header">
+      <h3>Riwayat Baca</h3>
+      <div class="panel-controls">
+        <button class="panel-control-btn" id="clearAllHistory" title="Hapus Semua">
+          <i class="fas fa-trash"></i>
+        </button>
+        <button class="close-panel">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+    <div class="side-panel-content" id="historyContent">
+      <!-- Content will be populated by JavaScript -->
+    </div>
+  </div>
+
+  <!-- Mobile Menu Cards -->
+  <div class="mobile-menu-cards" id="mobileMenuCards">
+    <div class="menu-cards-container">
+      <a href="index.html" class="menu-card mobile-card-hover" data-page="beranda">
+        <i class="fas fa-home"></i>
+        <span>Beranda</span>
+      </a>
+      <a href="berita.html" class="menu-card mobile-card-hover active" data-page="berita">
+        <i class="fas fa-newspaper"></i>
+        <span>Berita</span>
+      </a>
+      <a href="tentang.html" class="menu-card mobile-card-hover" data-page="tentang">
+        <i class="fas fa-info-circle"></i>
+        <span>Tentang</span>
+      </a>
+      <a href="kontak.html" class="menu-card mobile-card-hover" data-page="kontak">
+        <i class="fas fa-envelope"></i>
+        <span>Kontak</span>
+      </a>
+    </div>
+  </div>
+  
+  <footer>© 2025 Owner labeled as Al-generated</footer>
+
+  <!-- Scroll to Top Button -->
+  <button class="scroll-to-top" id="scrollToTop">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <script>
+    // Loading Screen
+    window.addEventListener('load', () => {
+      const loading = document.getElementById('loading');
+      setTimeout(() => {
+        loading.classList.add('hidden');
+      }, 1000);
+    });
+
+    // Notifikasi Mode Baca
+    const ReadingModeNotification = {
+      notification: null,
+      title: null,
+      message: null,
+      closeBtn: null,
+      timeout: null,
+      
+      init: () => {
+        ReadingModeNotification.notification = document.getElementById('readingModeNotification');
+        ReadingModeNotification.title = document.getElementById('notificationTitle');
+        ReadingModeNotification.message = document.getElementById('notificationMessage');
+        ReadingModeNotification.closeBtn = document.getElementById('notificationClose');
+        
+        ReadingModeNotification.closeBtn.addEventListener('click', ReadingModeNotification.hide);
+        
+        // Auto-hide after 5 seconds
+        ReadingModeNotification.notification.addEventListener('mouseenter', () => {
+          if (ReadingModeNotification.timeout) {
+            clearTimeout(ReadingModeNotification.timeout);
+          }
+        });
+        
+        ReadingModeNotification.notification.addEventListener('mouseleave', () => {
+          if (ReadingModeNotification.notification.classList.contains('active')) {
+            ReadingModeNotification.timeout = setTimeout(() => {
+              ReadingModeNotification.hide();
+            }, 3000);
+          }
+        });
+      },
+      
+      show: (isActive) => {
+        if (ReadingModeNotification.timeout) {
+          clearTimeout(ReadingModeNotification.timeout);
+        }
+        
+        if (isActive) {
+          ReadingModeNotification.notification.classList.add('reading-active');
+          ReadingModeNotification.notification.classList.remove('reading-inactive');
+          ReadingModeNotification.title.textContent = 'Mode Baca Diaktifkan';
+          ReadingModeNotification.message.textContent = 'Pengalaman membaca yang lebih nyaman telah diaktifkan';
+        } else {
+          ReadingModeNotification.notification.classList.add('reading-inactive');
+          ReadingModeNotification.notification.classList.remove('reading-active');
+          ReadingModeNotification.title.textContent = 'Mode Baca Dinonaktifkan';
+          ReadingModeNotification.message.textContent = 'Kembali ke tampilan default';
+        }
+        
+        ReadingModeNotification.notification.classList.add('active');
+        
+        // Auto-hide after 5 seconds
+        ReadingModeNotification.timeout = setTimeout(() => {
+          ReadingModeNotification.hide();
+        }, 5000);
+      },
+      
+      hide: () => {
+        ReadingModeNotification.notification.classList.remove('active');
+        if (ReadingModeNotification.timeout) {
+          clearTimeout(ReadingModeNotification.timeout);
+        }
+      }
+    };
+
+    // Reading Mode functionality yang disempurnakan
+    const ReadingMode = {
+      isActive: false,
+      
+      init: () => {
+        // Load saved reading mode state
+        const savedReadingMode = localStorage.getItem('readingMode') === 'true';
+        if (savedReadingMode) {
+          ReadingMode.isActive = savedReadingMode;
+          ReadingMode.updateAllUI();
+        }
+        
+        // Event listener untuk tombol mode baca di utility
+        const readingModeBtn = document.getElementById('readingModeBtn');
+        readingModeBtn.addEventListener('click', ReadingMode.toggle);
+        
+        // Event listener untuk tombol mode baca di modal
+        document.addEventListener('click', (e) => {
+          if (e.target.closest('.modal-reading-mode-btn')) {
+            ReadingMode.toggle();
+          }
+        });
+        
+        // Initialize notification
+        ReadingModeNotification.init();
+      },
+      
+      toggle: () => {
+        ReadingMode.isActive = !ReadingMode.isActive;
+        localStorage.setItem('readingMode', ReadingMode.isActive);
+        ReadingMode.updateAllUI();
+        
+        // Show notification
+        ReadingModeNotification.show(ReadingMode.isActive);
+      },
+      
+      updateAllUI: () => {
+        // Update tombol utility
+        const utilityBtn = document.getElementById('readingModeBtn');
+        utilityBtn.classList.toggle('active', ReadingMode.isActive);
+        
+        // Update semua tombol mode baca di modal
+        document.querySelectorAll('.modal-reading-mode-btn').forEach(btn => {
+          btn.classList.toggle('active', ReadingMode.isActive);
+        });
+        
+        // Update semua modal yang terbuka
+        document.querySelectorAll('.modal.active').forEach(modal => {
+          if (ReadingMode.isActive) {
+            modal.classList.add('reading-mode');
+          } else {
+            modal.classList.remove('reading-mode');
+          }
+        });
+      },
+      
+      // Fungsi untuk menerapkan mode baca ke modal yang baru dibuka
+      applyToModal: (modal) => {
+        if (ReadingMode.isActive) {
+          modal.classList.add('reading-mode');
+        } else {
+          modal.classList.remove('reading-mode');
+        }
+        
+        // Update tombol mode baca di modal
+        const readingModeBtn = modal.querySelector('.modal-reading-mode-btn');
+        if (readingModeBtn) {
+          readingModeBtn.classList.toggle('active', ReadingMode.isActive);
+        }
+      }
+    };
+
+    // Data storage management
+    const NewsManager = {
+      // Get bookmarks from localStorage
+      getBookmarks: () => {
+        const bookmarks = localStorage.getItem('newsBookmarks');
+        return bookmarks ? JSON.parse(bookmarks) : [];
+      },
+      
+      // Save bookmarks to localStorage
+      saveBookmarks: (bookmarks) => {
+        localStorage.setItem('newsBookmarks', JSON.stringify(bookmarks));
+        NewsManager.updateBookmarkCount();
+        NewsManager.initBookmarkButtons(); // Refresh bookmark icons
+      },
+      
+      // Add a bookmark
+      addBookmark: (id) => {
+        const bookmarks = NewsManager.getBookmarks();
+        if (!bookmarks.includes(id)) {
+          bookmarks.push(id);
+          NewsManager.saveBookmarks(bookmarks);
+        }
+      },
+      
+      // Remove a bookmark
+      removeBookmark: (id) => {
+        const bookmarks = NewsManager.getBookmarks();
+        const index = bookmarks.indexOf(id);
+        if (index > -1) {
+          bookmarks.splice(index, 1);
+          NewsManager.saveBookmarks(bookmarks);
+        }
+      },
+      
+      // Clear all bookmarks
+      clearAllBookmarks: () => {
+        if (confirm('Apakah Anda yakin ingin menghapus semua bookmark?')) {
+          NewsManager.saveBookmarks([]);
+          NewsManager.initBookmarkButtons();
+          NewsManager.populateBookmarksPanel();
+        }
+      },
+      
+      // Get history from localStorage
+      getHistory: () => {
+        const history = localStorage.getItem('newsHistory');
+        return history ? JSON.parse(history) : [];
+      },
+      
+      // Save history to localStorage
+      saveHistory: (history) => {
+        localStorage.setItem('newsHistory', JSON.stringify(history));
+        NewsManager.updateHistoryCount();
+        NewsManager.updateLastReadText(); // Update last read text
+      },
+      
+      // Add to history
+      addToHistory: (id, title, image, date, category) => {
+        const history = NewsManager.getHistory();
+        const existingIndex = history.findIndex(item => item.id === id);
+        
+        if (existingIndex > -1) {
+          history.splice(existingIndex, 1);
+        }
+        
+        history.unshift({
+          id,
+          title,
+          image,
+          date,
+          category,
+          timestamp: new Date().toISOString()
+        });
+        
+        // Keep only the last 20 items
+        if (history.length > 20) {
+          history.splice(20);
+        }
+        
+        NewsManager.saveHistory(history);
+      },
+      
+      // Remove from history
+      removeFromHistory: (id) => {
+        const history = NewsManager.getHistory();
+        const index = history.findIndex(item => item.id === id);
+        if (index > -1) {
+          history.splice(index, 1);
+          NewsManager.saveHistory(history);
+        }
+      },
+      
+      // Clear all history
+      clearAllHistory: () => {
+        if (confirm('Apakah Anda yakin ingin menghapus semua riwayat baca?')) {
+          NewsManager.saveHistory([]);
+          NewsManager.populateHistoryPanel();
+          NewsManager.updateLastReadText();
+        }
+      },
+      
+      // Update bookmark count badge
+      updateBookmarkCount: () => {
+        const bookmarks = NewsManager.getBookmarks();
+        const badge = document.getElementById('bookmarkCount');
+        if (badge) {
+          badge.textContent = bookmarks.length;
+        }
+      },
+      
+      // Update history count badge
+      updateHistoryCount: () => {
+        const history = NewsManager.getHistory();
+        const badge = document.getElementById('historyCount');
+        if (badge) {
+          badge.textContent = history.length;
+        }
+      },
+      
+      // Initialize bookmark buttons
+      initBookmarkButtons: () => {
+        const bookmarks = NewsManager.getBookmarks();
+        
+        // Update bookmark buttons on cards
+        document.querySelectorAll('.bookmark-btn').forEach(btn => {
+          const id = btn.getAttribute('data-id');
+          if (bookmarks.includes(id)) {
+            btn.classList.add('active');
+            btn.innerHTML = '<i class="fas fa-bookmark"></i>';
+          } else {
+            btn.classList.remove('active');
+            btn.innerHTML = '<i class="far fa-bookmark"></i>';
+          }
+        });
+        
+        // Update bookmark buttons in modals
+        document.querySelectorAll('.modal-bookmark-btn').forEach(btn => {
+          const id = btn.getAttribute('data-id');
+          if (bookmarks.includes(id)) {
+            btn.classList.add('active');
+            btn.innerHTML = '<i class="fas fa-bookmark"></i>';
+          } else {
+            btn.classList.remove('active');
+            btn.innerHTML = '<i class="far fa-bookmark"></i>';
+          }
+        });
+      },
+      
+      // Populate bookmarks panel
+      populateBookmarksPanel: () => {
+        const bookmarks = NewsManager.getBookmarks();
+        const container = document.getElementById('bookmarksContent');
+        
+        if (bookmarks.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <i class="far fa-bookmark"></i>
+              <p>Belum ada berita yang disimpan</p>
+            </div>
+          `;
+          return;
+        }
+        
+        let html = '';
+        bookmarks.forEach(id => {
+          const card = document.querySelector(`.news-card[data-modal="modal${id}"]`);
+          if (card) {
+            const title = card.querySelector('h3').textContent;
+            const image = card.querySelector('img').src;
+            const date = card.getAttribute('data-date');
+            const category = card.getAttribute('data-category');
+            
+            html += `
+              <div class="side-panel-item" data-id="${id}">
+                <img src="${image}" alt="${title}">
+                <div class="side-panel-item-content">
+                  <h4>${title}</h4>
+                  <p>${card.querySelector('p').textContent}</p>
+                  <div class="side-panel-item-meta">
+                    <span>${date}</span>
+                    <span>${category}</span>
+                  </div>
+                </div>
+                <button class="remove-item-btn" data-id="${id}">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            `;
+          }
+        });
+        
+        container.innerHTML = html;
+      },
+      
+      // Populate history panel
+      populateHistoryPanel: () => {
+        const history = NewsManager.getHistory();
+        const container = document.getElementById('historyContent');
+        
+        if (history.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <i class="far fa-clock"></i>
+              <p>Belum ada riwayat baca</p>
+            </div>
+          `;
+          return;
+        }
+        
+        let html = '';
+        history.forEach(item => {
+          html += `
+            <div class="side-panel-item" data-id="${item.id}">
+              <img src="${item.image}" alt="${item.title}">
+              <div class="side-panel-item-content">
+                <h4>${item.title}</h4>
+                <p>${new Date(item.timestamp).toLocaleDateString('id-ID')}</p>
+                <div class="side-panel-item-meta">
+                  <span>${item.date}</span>
+                  <span>${item.category}</span>
+                </div>
+              </div>
+              <button class="remove-item-btn" data-id="${item.id}">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          `;
+        });
+        
+        container.innerHTML = html;
+      },
+      
+      // Update last read text on news cards
+      updateLastReadText: () => {
+        const history = NewsManager.getHistory();
+        document.querySelectorAll('.last-read').forEach(element => {
+          const id = element.getAttribute('data-id');
+          const historyItem = history.find(item => item.id === id);
+          if (historyItem) {
+            const lastRead = new Date(historyItem.timestamp);
+            const now = new Date();
+            const diffMs = now - lastRead;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+
+            let text = '';
+            if (diffMins < 1) {
+              text = 'Baru saja';
+            } else if (diffMins < 60) {
+              text = `${diffMins} menit yang lalu`;
+            } else if (diffHours < 24) {
+              text = `${diffHours} jam yang lalu`;
+            } else {
+              text = `${diffDays} hari yang lalu`;
+            }
+            element.textContent = text;
+          } else {
+            element.textContent = 'Belum dibaca';
+          }
+        });
+      }
+    };
+
+    // Search and Filter functionality
+    const SearchFilter = {
+      init: () => {
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const sortFilter = document.getElementById('sortFilter');
+        
+        searchInput.addEventListener('input', SearchFilter.filterNews);
+        categoryFilter.addEventListener('change', SearchFilter.filterNews);
+        sortFilter.addEventListener('change', SearchFilter.filterNews);
+      },
+      
+      filterNews: () => {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const category = document.getElementById('categoryFilter').value;
+        const sortBy = document.getElementById('sortFilter').value;
+        
+        const cards = document.querySelectorAll('.news-card');
+        let visibleCards = [];
+        
+        cards.forEach(card => {
+          const title = card.querySelector('h3').textContent.toLowerCase();
+          const description = card.querySelector('p').textContent.toLowerCase();
+          const cardCategory = card.getAttribute('data-category');
+          const date = card.getAttribute('data-date');
+          
+          const matchesSearch = title.includes(searchTerm) || description.includes(searchTerm);
+          const matchesCategory = !category || cardCategory === category;
+          
+          if (matchesSearch && matchesCategory) {
+            card.style.display = 'block';
+            visibleCards.push({
+              element: card,
+              date: date
+            });
+          } else {
+            card.style.display = 'none';
+          }
+        });
+        
+        // Sort the visible cards
+        SearchFilter.sortCards(visibleCards, sortBy);
+        
+        // Show message if no results
+        const noResultsMsg = document.getElementById('noResults');
+        if (visibleCards.length === 0) {
+          if (!noResultsMsg) {
+            const msg = document.createElement('div');
+            msg.id = 'noResults';
+            msg.className = 'empty-state';
+            msg.innerHTML = `
+              <i class="fas fa-search"></i>
+              <p>Tidak ada berita yang sesuai dengan pencarian</p>
+            `;
+            document.querySelector('.news-grid').appendChild(msg);
+          }
+        } else if (noResultsMsg) {
+          noResultsMsg.remove();
+        }
+      },
+      
+      sortCards: (cards, sortBy) => {
+        const grid = document.querySelector('.news-grid');
+        
+        if (sortBy === 'newest') {
+          cards.sort((a, b) => new Date(b.date) - new Date(a.date));
+        } else if (sortBy === 'oldest') {
+          cards.sort((a, b) => new Date(a.date) - new Date(b.date));
+        } else if (sortBy === 'popular') {
+          // For demo purposes, we'll sort by date (newest first)
+          // In a real app, this would use actual popularity metrics
+          cards.sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+        
+        // Reorder the cards in the DOM
+        cards.forEach(card => {
+          grid.appendChild(card.element);
+        });
+      }
+    };
+
+    // Modal Navigation functionality
+    const ModalNavigation = {
+      currentModalId: null,
+      totalModals: 16,
+      
+      init: () => {
+        // Tambahkan tombol mode baca ke semua modal
+        document.querySelectorAll('.modal').forEach(modal => {
+          const header = modal.querySelector('.modal-header');
+          if (header && !header.querySelector('.modal-reading-mode-btn')) {
+            const readingModeBtn = document.createElement('button');
+            readingModeBtn.className = 'modal-reading-mode-btn';
+            readingModeBtn.title = 'Mode Baca';
+            readingModeBtn.innerHTML = '<i class="fas fa-book-open"></i>';
+            
+            // Sisipkan sebelum tombol close
+            const closeBtn = header.querySelector('.close-modal');
+            header.insertBefore(readingModeBtn, closeBtn);
+          }
+        });
+        
+        // Event listeners untuk navigasi
+        document.addEventListener('click', (e) => {
+          if (e.target.closest('#prevBtn')) {
+            ModalNavigation.navigateToPrev();
+          } else if (e.target.closest('#nextBtn')) {
+            ModalNavigation.navigateToNext();
+          }
+        });
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+          if (document.querySelector('.modal.active')) {
+            if (e.key === 'ArrowLeft') {
+              ModalNavigation.navigateToPrev();
+            } else if (e.key === 'ArrowRight') {
+              ModalNavigation.navigateToNext();
+            } else if (e.key === 'Escape') {
+              ModalNavigation.closeCurrentModal();
+            }
+          }
+        });
+      },
+      
+      navigateToPrev: () => {
+        if (!ModalNavigation.currentModalId) return;
+        
+        const currentId = parseInt(ModalNavigation.currentModalId.replace('modal', ''));
+        if (currentId > 1) {
+          const prevId = `modal${currentId - 1}`;
+          ModalNavigation.closeCurrentModal();
+          ModalNavigation.openModal(prevId);
+        }
+      },
+      
+      navigateToNext: () => {
+        if (!ModalNavigation.currentModalId) return;
+        
+        const currentId = parseInt(ModalNavigation.currentModalId.replace('modal', ''));
+        if (currentId < ModalNavigation.totalModals) {
+          const nextId = `modal${currentId + 1}`;
+          ModalNavigation.closeCurrentModal();
+          ModalNavigation.openModal(nextId);
+        }
+      },
+      
+      openModal: (modalId) => {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+          modal.classList.add('active');
+          document.body.style.overflow = 'hidden';
+          ModalNavigation.currentModalId = modalId;
+          
+          // Update navigation info
+          const modalNumber = parseInt(modalId.replace('modal', ''));
+          const infoElement = modal.querySelector('.modal-nav-info');
+          if (infoElement) {
+            infoElement.textContent = `Berita ${modalNumber} dari ${ModalNavigation.totalModals}`;
+          }
+          
+          // Update navigation buttons state
+          const prevBtn = modal.querySelector('#prevBtn');
+          const nextBtn = modal.querySelector('#nextBtn');
+          
+          if (prevBtn) {
+            prevBtn.disabled = modalNumber === 1;
+          }
+          
+          if (nextBtn) {
+            nextBtn.disabled = modalNumber === ModalNavigation.totalModals;
+          }
+          
+          // Terapkan mode baca jika aktif
+          ReadingMode.applyToModal(modal);
+          
+          // Add to history
+          const card = document.querySelector(`.news-card[data-modal="${modalId}"]`);
+          if (card) {
+            const id = modalId.replace('modal', '');
+            const title = card.querySelector('h3').textContent;
+            const image = card.querySelector('img').src;
+            const date = card.getAttribute('data-date');
+            const category = card.getAttribute('data-category');
+            
+            NewsManager.addToHistory(id, title, image, date, category);
+          }
+          
+          // Update bookmark buttons in modal
+          NewsManager.initBookmarkButtons();
+        }
+      },
+      
+      closeCurrentModal: () => {
+        const activeModal = document.querySelector('.modal.active');
+        if (activeModal) {
+          activeModal.classList.remove('active');
+          document.body.style.overflow = 'auto';
+          ModalNavigation.currentModalId = null;
+        }
+      }
+    };
+
+    // Mobile Plus Button Toggle
+    const mobilePlusBtn = document.getElementById('mobilePlusBtn');
+    const mobileMenuCards = document.getElementById('mobileMenuCards');
+    
+    mobilePlusBtn.addEventListener('click', () => {
+      mobilePlusBtn.classList.toggle('active');
+      mobileMenuCards.classList.toggle('active');
+    });
+
+    // Close mobile menu cards when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!mobileMenuCards.contains(e.target) && !mobilePlusBtn.contains(e.target)) {
+        mobilePlusBtn.classList.remove('active');
+        mobileMenuCards.classList.remove('active');
+      }
+    });
+
+    // Deteksi status koneksi
+    function updateOnlineStatus() {
+      const offlineIndicator = document.getElementById('offlineIndicator');
+      
+      if (navigator.onLine) {
+        offlineIndicator.classList.remove('show');
+      } else {
+        offlineIndicator.classList.add('show');
+      }
+    }
+
+    // Scroll Effects
+    window.addEventListener('scroll', () => {
+      const navbar = document.getElementById('navbar');
+      const scrollToTop = document.getElementById('scrollToTop');
+      
+      // Navbar background change on scroll
+      if (window.scrollY > 60) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+      
+      // Show/hide scroll to top button
+      if (window.scrollY > 500) {
+        scrollToTop.classList.add('visible');
+      } else {
+        scrollToTop.classList.remove('visible');
+      }
+      
+      // Animate elements on scroll
+      animateOnScroll();
+    });
+
+    // Scroll to Top Functionality
+    document.getElementById('scrollToTop').addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+
+    // Animate elements on scroll
+    function animateOnScroll() {
+      const fadeElements = document.querySelectorAll('.fade-in');
+      
+      fadeElements.forEach(element => {
+        const elementTop = element.getBoundingClientRect().top;
+        const elementVisible = 150;
+        
+        if (elementTop < window.innerHeight - elementVisible) {
+          element.style.opacity = '1';
+          element.style.transform = 'translateY(0)';
+        }
+      });
+    }
+
+    // Initialize fade-in elements
+    document.querySelectorAll('.fade-in').forEach(element => {
+      element.style.opacity = '0';
+      element.style.transform = 'translateY(30px)';
+      element.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+    });
+
+    // NAV AKTIF OTOMATIS
+    const currentPage = location.pathname.split('/').pop().replace('.html', '') || 'beranda';
+    document.querySelectorAll('nav a, .menu-card').forEach(link => {
+      if (link.getAttribute('data-page') === currentPage) {
+        link.classList.add('active');
+      }
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelectorAll('nav a, .menu-card').forEach(a => a.classList.remove('active'));
+        link.classList.add('active');
+        
+        // Tutup menu mobile setelah memilih
+        mobilePlusBtn.classList.remove('active');
+        mobileMenuCards.classList.remove('active');
+        
+        setTimeout(() => window.location.href = link.href, 200);
+      });
+    });
+
+    // Add hover effects for mobile cards
+    document.querySelectorAll('.menu-card').forEach(card => {
+      card.addEventListener('touchstart', function() {
+        this.classList.add('hover');
+      });
+      
+      card.addEventListener('touchend', function() {
+        this.classList.remove('hover');
+      });
+    });
+
+    // Canvas Galaxy
+    const canvas = document.getElementById('galaxy');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function initCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      particles = [];
+      const count = window.innerWidth < 576 ? 60 : window.innerWidth < 992 ? 120 : 200;
+      for (let i = 0; i < count; i++) particles.push(new Particle());
+    }
+
+    class Particle {
+      constructor() { this.reset(); }
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2 + 0.5;
+        this.speedX = Math.random() * 0.6 - 0.3;
+        this.speedY = Math.random() * 0.6 - 0.3;
+        this.opacity = Math.random() * 0.6 + 0.4;
+      }
+      update() {
+        this.x += this.speedX; this.y += this.speedY;
+        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+      }
+      draw() {
+        ctx.fillStyle = `rgba(0, 243, 255, ${this.opacity})`;
+        ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+
+    function animate() {
+      ctx.fillStyle = 'rgba(10, 10, 42, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => { p.update(); p.draw(); });
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', initCanvas);
+    initCanvas(); animate();
+
+    // Modal
+    document.querySelectorAll('.news-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const modalId = card.getAttribute('data-modal');
+        ModalNavigation.openModal(modalId);
+      });
+    });
+
+    document.querySelectorAll('.close-modal').forEach(btn => {
+      btn.addEventListener('click', () => {
+        ModalNavigation.closeCurrentModal();
+      });
+    });
+
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          ModalNavigation.closeCurrentModal();
+        }
+      });
+    });
+
+    // Bookmark functionality
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('.bookmark-btn') || e.target.closest('.modal-bookmark-btn')) {
+        const btn = e.target.closest('.bookmark-btn') || e.target.closest('.modal-bookmark-btn');
+        const id = btn.getAttribute('data-id');
+        
+        if (btn.classList.contains('active')) {
+          NewsManager.removeBookmark(id);
+          btn.classList.remove('active');
+          btn.innerHTML = '<i class="far fa-bookmark"></i>';
+        } else {
+          NewsManager.addBookmark(id);
+          btn.classList.add('active');
+          btn.innerHTML = '<i class="fas fa-bookmark"></i>';
+        }
+        
+        // Update bookmarks panel if open
+        if (document.getElementById('bookmarksPanel').classList.contains('active')) {
+          NewsManager.populateBookmarksPanel();
+        }
+      }
+    });
+
+    // Side panels functionality
+    document.getElementById('bookmarksBtn').addEventListener('click', () => {
+      document.getElementById('bookmarksPanel').classList.add('active');
+      NewsManager.populateBookmarksPanel();
+    });
+    
+    document.getElementById('historyBtn').addEventListener('click', () => {
+      document.getElementById('historyPanel').classList.add('active');
+      NewsManager.populateHistoryPanel();
+    });
+    
+    document.querySelectorAll('.close-panel').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.side-panel').forEach(panel => {
+          panel.classList.remove('active');
+        });
+      });
+    });
+    
+    // Clear all bookmarks and history
+    document.getElementById('clearAllBookmarks').addEventListener('click', () => {
+      NewsManager.clearAllBookmarks();
+    });
+    
+    document.getElementById('clearAllHistory').addEventListener('click', () => {
+      NewsManager.clearAllHistory();
+    });
+    
+    // Remove individual items from bookmarks and history
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('.remove-item-btn')) {
+        const btn = e.target.closest('.remove-item-btn');
+        const id = btn.getAttribute('data-id');
+        const panel = btn.closest('.side-panel');
+        
+        if (panel.id === 'bookmarksPanel') {
+          NewsManager.removeBookmark(id);
+          NewsManager.populateBookmarksPanel();
+          NewsManager.initBookmarkButtons();
+        } else if (panel.id === 'historyPanel') {
+          NewsManager.removeFromHistory(id);
+          NewsManager.populateHistoryPanel();
+        }
+      }
+    });
+    
+    // Click on side panel items to open the corresponding modal
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('.side-panel-item') && !e.target.closest('.remove-item-btn')) {
+        const item = e.target.closest('.side-panel-item');
+        const id = item.getAttribute('data-id');
+        
+        ModalNavigation.openModal(`modal${id}`);
+        
+        // Close the side panel
+        document.querySelectorAll('.side-panel').forEach(panel => {
+          panel.classList.remove('active');
+        });
+      }
+    });
+
+    // Combine scroll animations
+    function handleScrollAnimations() {
+      animateOnScroll();
+    }
+
+    window.addEventListener('scroll', handleScrollAnimations);
+    
+    // Initialize on load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        animateOnScroll();
+        
+        // Initialize news manager
+        NewsManager.updateBookmarkCount();
+        NewsManager.updateHistoryCount();
+        NewsManager.initBookmarkButtons();
+        NewsManager.updateLastReadText();
+        
+        // Initialize search and filter
+        SearchFilter.init();
+        
+        // Initialize reading mode
+        ReadingMode.init();
+        
+        // Initialize modal navigation
+        ModalNavigation.init();
+      }, 500);
+    });
+
+    // OFFLINE/ONLINE EVENT LISTENERS
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+  </script>
+</body>
+</html>

@@ -1,0 +1,2660 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kontak | ARIF Galaxy Web3</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- EmailJS SDK -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  
+  <!-- reCAPTCHA -->
+  <script src="https://www.google.com/recaptcha/api.js?render=YOUR_RECAPTCHA_SITE_KEY"></script>
+  
+  <!-- Firebase SDK (untuk chat real-time) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  
+  <style>
+    :root {
+      --bg1: #0a0a2a; --bg2: #1a1a4a; --neon: #00f3ff; --purple: #9d00ff; --text: #fff;
+      --max-w: 1600px; --pad: 5%; --gap: 4rem;
+      --card-bg: rgba(26, 26, 74, 0.6); --card-border: rgba(0, 243, 255, 0.2);
+      --success: #00ff88; --error: #ff4444; --warning: #ffaa00;
+      --user-msg: rgba(0, 243, 255, 0.2); --admin-msg: rgba(157, 0, 255, 0.2);
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+    body { background: linear-gradient(135deg, var(--bg1), var(--bg2)); color: var(--text); font-family: 'Orbitron', sans-serif; min-height: 100vh; overflow-x: hidden; }
+    canvas { position: fixed; top:0; left:0; width:100%; height:100%; z-index:-1; pointer-events:none; }
+
+    /* Header & Navigation */
+    header {
+      position: fixed; top:0; left:0; width:100%; z-index:1000;
+      background: rgba(10,10,42,0.85); backdrop-filter: blur(12px);
+      padding: clamp(0.8rem, 2vw, 1.5rem) var(--pad);
+      display: flex; justify-content: space-between; align-items: center;
+      transition: all 0.4s ease;
+    }
+    header.scrolled { background: rgba(10,10,42,0.95); padding: 0.6rem var(--pad); }
+    .logo { 
+      font-size: clamp(1.4rem, 4vw, 2.2rem); 
+      font-weight: 900; 
+      color: var(--neon); 
+      text-shadow: 0 0 12px var(--neon); 
+      transition: all 0.3s; 
+    }
+    header.scrolled .logo { font-size: clamp(1.2rem, 3vw, 1.8rem); }
+    
+    nav ul { display: flex; gap: clamp(1.5rem, 2.5vw, 3rem); list-style: none; }
+    nav a { color: var(--text); text-decoration: none; font-weight: 600; font-size: clamp(0.85rem, 2vw, 1.1rem); position: relative; padding: 0.5rem 0; transition: color 0.3s; }
+    nav a::after { content: ''; position: absolute; bottom: -6px; left: 0; width: 0; height: 3px; background: var(--neon); border-radius: 2px; transition: width 0.4s; }
+    nav a:hover::after, nav a.active::after { width: 100%; }
+    nav a:hover, nav a.active { color: var(--neon); text-shadow: 0 0 10px var(--neon); }
+    
+    .mobile-menu-btn { display: none; background: none; border: none; color: var(--neon); font-size: 1.5rem; cursor: pointer; }
+
+    /* Plus Button di Kanan Atas untuk Mobile */
+    .mobile-plus-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--neon);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .mobile-plus-btn.active {
+      transform: rotate(45deg);
+      background: rgba(0, 243, 255, 0.1);
+    }
+
+    /* Hero Section */
+    .contact-hero { 
+      min-height: 100vh; 
+      display: flex; 
+      align-items: center; 
+      padding: clamp(80px, 8vh, 120px) var(--pad) 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .contact-container { 
+      max-width: var(--max-w); 
+      margin: 0 auto; 
+      width: 100%; 
+    }
+    .contact-heading { 
+      text-align: center; 
+      margin-bottom: 3rem; 
+    }
+    .contact-heading h1 { 
+      font-size: clamp(2.2rem, 6vw, 4rem); 
+      line-height: 1.1; 
+      margin-bottom: 1rem; 
+      background: linear-gradient(90deg, var(--neon), var(--purple)); 
+      -webkit-background-clip: text; 
+      -webkit-text-fill-color: transparent; 
+      animation: glow 2s ease-in-out infinite alternate; 
+    }
+    .contact-heading p { 
+      font-size: clamp(0.95rem, 2.2vw, 1.4rem); 
+      opacity: 0.9; 
+      line-height: 1.7; 
+      max-width: 700px; 
+      margin: 0 auto; 
+    }
+    
+    .contact-grid { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: var(--gap); 
+      align-items: start; 
+    }
+    
+    /* Contact Form */
+    .contact-form { 
+      background: var(--card-bg); 
+      backdrop-filter: blur(10px); 
+      padding: 2.5rem; 
+      border-radius: 20px; 
+      border: 1px solid var(--card-border); 
+      box-shadow: 0 0 30px rgba(0, 243, 255, 0.2); 
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s;
+    }
+    .contact-form::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,243,255,0.1));
+      transition: left 0.6s;
+    }
+    .contact-form:hover::before {
+      left: 100%;
+    }
+    .contact-form:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0, 243, 255, 0.3);
+    }
+    
+    .form-group { 
+      margin-bottom: 1.5rem; 
+      position: relative;
+    }
+    .form-group label { 
+      display: block; 
+      margin-bottom: 0.5rem; 
+      font-weight: 600; 
+      color: var(--neon); 
+    }
+    .form-control { 
+      width: 100%; 
+      padding: 0.8rem 1rem; 
+      background: rgba(10, 10, 42, 0.7); 
+      border: 1px solid rgba(0, 243, 255, 0.3); 
+      border-radius: 8px; 
+      color: var(--text); 
+      font-family: 'Orbitron', sans-serif; 
+      transition: all 0.3s; 
+    }
+    .form-control:focus { 
+      outline: none; 
+      border-color: var(--neon); 
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.5); 
+    }
+    
+    /* Validasi Input */
+    .form-control.valid {
+      border-color: var(--success);
+      box-shadow: 0 0 5px rgba(0, 255, 136, 0.3);
+    }
+    
+    .form-control.invalid {
+      border-color: var(--error);
+      box-shadow: 0 0 5px rgba(255, 68, 68, 0.3);
+    }
+    
+    .validation-message {
+      display: block;
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    
+    .validation-message.valid {
+      color: var(--success);
+    }
+    
+    .validation-message.invalid {
+      color: var(--error);
+    }
+    
+    textarea.form-control { 
+      min-height: 150px; 
+      resize: vertical; 
+    }
+    
+    /* Character Counter */
+    .char-counter {
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+      text-align: right;
+      font-weight: 600;
+    }
+    
+    /* reCAPTCHA Badge Customization */
+    .grecaptcha-badge { 
+      visibility: visible !important;
+    }
+    
+    /* Alert Messages */
+    .alert {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      display: none;
+      align-items: center;
+      gap: 0.7rem;
+    }
+    
+    .alert-success {
+      background: rgba(0, 255, 136, 0.1);
+      border: 1px solid var(--success);
+      color: var(--success);
+    }
+    
+    .alert-error {
+      background: rgba(255, 68, 68, 0.1);
+      border: 1px solid var(--error);
+      color: var(--error);
+    }
+    
+    .alert-warning {
+      background: rgba(255, 170, 0, 0.1);
+      border: 1px solid var(--warning);
+      color: var(--warning);
+    }
+    
+    /* Contact Info */
+    .contact-info { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 2rem; 
+    }
+    .info-card { 
+      background: var(--card-bg); 
+      backdrop-filter: blur(10px); 
+      padding: 2rem; 
+      border-radius: 15px; 
+      border: 1px solid var(--card-border); 
+      box-shadow: 0 0 20px rgba(0, 243, 255, 0.1); 
+      transition: all 0.3s; 
+      position: relative;
+      overflow: hidden;
+    }
+    .info-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,243,255,0.1));
+      transition: left 0.5s;
+    }
+    .info-card:hover::before {
+      left: 100%;
+    }
+    .info-card:hover { 
+      transform: translateY(-5px); 
+      box-shadow: 0 0 25px rgba(0, 243, 255, 0.3); 
+    }
+    .info-card h3 { 
+      color: var(--neon); 
+      margin-bottom: 1rem; 
+      font-size: 1.3rem; 
+    }
+    .info-card p { 
+      margin-bottom: 0.5rem; 
+      opacity: 0.9; 
+    }
+    .info-card a { 
+      color: var(--text); 
+      text-decoration: none; 
+      transition: color 0.3s; 
+    }
+    .info-card a:hover { 
+      color: var(--neon); 
+    }
+    
+    .social-links { 
+      display: flex; 
+      gap: 1rem; 
+      margin-top: 1rem; 
+    }
+    .social-link { 
+      display: inline-flex; 
+      align-items: center; 
+      justify-content: center; 
+      width: 40px; 
+      height: 40px; 
+      background: rgba(0, 243, 255, 0.1); 
+      border-radius: 50%; 
+      color: var(--neon); 
+      text-decoration: none; 
+      transition: all 0.3s; 
+    }
+    .social-link:hover { 
+      background: var(--neon); 
+      color: var(--bg1); 
+      transform: translateY(-3px); 
+      box-shadow: 0 0 15px var(--neon); 
+    }
+    
+    /* Button */
+    .btn { 
+      display: inline-block; 
+      padding: clamp(12px, 2vw, 16px) clamp(28px, 4vw, 40px); 
+      background: transparent; 
+      color: var(--neon); 
+      border: 2px solid var(--neon); 
+      border-radius: 50px; 
+      font-weight: bold; 
+      text-decoration: none; 
+      font-size: clamp(0.9rem, 2vw, 1.1rem); 
+      transition: all 0.5s; 
+      box-shadow: 0 0 20px rgba(0,243,255,0.3); 
+      position: relative; 
+      overflow: hidden; 
+      cursor: pointer; 
+    }
+    .btn::before { 
+      content: ''; 
+      position: absolute; 
+      top:0; 
+      left:-100%; 
+      width:100%; 
+      height:100%; 
+      background: linear-gradient(90deg, transparent, rgba(0,243,255,0.2)); 
+      transition: left 0.7s; 
+    }
+    .btn:hover::before { 
+      left: 100%; 
+    }
+    .btn:hover { 
+      background: rgba(0,243,255,0.15); 
+      box-shadow: 0 0 30px var(--neon); 
+      transform: translateY(-3px); 
+    }
+    
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .btn-success {
+      background: rgba(0, 255, 136, 0.1);
+      border-color: var(--success);
+      color: var(--success);
+      box-shadow: 0 0 20px rgba(0,255,136,0.3);
+    }
+    
+    .btn-error {
+      background: rgba(255, 68, 68, 0.1);
+      border-color: var(--error);
+      color: var(--error);
+      box-shadow: 0 0 20px rgba(255,68,68,0.3);
+    }
+    
+    /* Chat Container Section */
+    .chat-section {
+      margin-top: 3rem;
+      padding: 2rem var(--pad);
+      display: none; /* Awalnya disembunyikan */
+    }
+    
+    .chat-container {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
+      border: 1px solid var(--card-border);
+      transition: all 0.4s;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .chat-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,243,255,0.1));
+      transition: left 0.6s;
+      z-index: 1;
+    }
+    
+    .chat-container:hover::before {
+      left: 100%;
+    }
+    
+    .chat-header {
+      padding: 2rem;
+      text-align: center;
+      border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+      background: rgba(10, 10, 42, 0.5);
+    }
+    
+    .chat-header h2 {
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      color: var(--neon);
+      margin-bottom: 0.5rem;
+    }
+    
+    .chat-header p {
+      opacity: 0.9;
+    }
+    
+    .chat-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: rgba(10, 10, 42, 0.3);
+      border-bottom: 1px solid rgba(0, 243, 255, 0.1);
+    }
+    
+    .chat-actions {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .chat-action-btn {
+      background: transparent;
+      border: 1px solid rgba(0, 243, 255, 0.3);
+      color: var(--neon);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.9rem;
+    }
+    
+    .chat-action-btn:hover {
+      background: rgba(0, 243, 255, 0.1);
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+    }
+    
+    .chat-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .status-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 10px var(--success);
+    }
+    
+    .chat-messages {
+      height: 400px;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      scroll-behavior: smooth;
+    }
+    
+    .chat-message {
+      max-width: 80%;
+      padding: 1rem;
+      border-radius: 15px;
+      position: relative;
+      animation: fadeInUp 0.3s ease-out;
+    }
+    
+    .user-message {
+      align-self: flex-end;
+      background: var(--user-msg);
+      border: 1px solid rgba(0, 243, 255, 0.3);
+    }
+    
+    .admin-message {
+      align-self: flex-start;
+      background: var(--admin-msg);
+      border: 1px solid rgba(157, 0, 255, 0.3);
+    }
+    
+    .file-message {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .file-icon {
+      color: var(--neon);
+    }
+    
+    .message-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+    
+    .message-sender {
+      font-weight: bold;
+    }
+    
+    .user-message .message-sender {
+      color: var(--neon);
+    }
+    
+    .admin-message .message-sender {
+      color: var(--purple);
+    }
+    
+    .message-time {
+      font-size: 0.7rem;
+    }
+    
+    .message-content {
+      word-wrap: break-word;
+      line-height: 1.5;
+    }
+    
+    /* Typing indicator */
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem;
+      opacity: 0.7;
+      max-width: 80%;
+      align-self: flex-start;
+    }
+    
+    .typing-dots {
+      display: flex;
+      gap: 0.3rem;
+    }
+    
+    .typing-dots span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--neon);
+      animation: typing 1.4s infinite ease-in-out;
+    }
+    
+    .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+    
+    @keyframes typing {
+      0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+    
+    .chat-input-area {
+      padding: 1.5rem;
+      border-top: 1px solid rgba(0, 243, 255, 0.1);
+      background: rgba(10, 10, 42, 0.3);
+    }
+    
+    .chat-input-wrapper {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .chat-input {
+      flex: 1;
+      padding: 0.8rem 1rem;
+      background: rgba(10, 10, 42, 0.7);
+      border: 1px solid rgba(0, 243, 255, 0.3);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Orbitron', sans-serif;
+      transition: all 0.3s;
+    }
+    
+    .chat-input:focus {
+      outline: none;
+      border-color: var(--neon);
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+    }
+    
+    .chat-send-btn {
+      background: transparent;
+      border: 2px solid var(--neon);
+      color: var(--neon);
+      padding: 0.8rem 1.5rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: bold;
+    }
+    
+    .chat-send-btn:hover:not(:disabled) {
+      background: rgba(0, 243, 255, 0.1);
+      box-shadow: 0 0 15px var(--neon);
+    }
+    
+    .chat-send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .empty-chat {
+      text-align: center;
+      padding: 2rem;
+      opacity: 0.7;
+    }
+    
+    /* File upload area */
+    .drag-over {
+      background: rgba(0, 243, 255, 0.1) !important;
+      border: 2px dashed var(--neon) !important;
+    }
+    
+    .file-upload-btn {
+      background: transparent;
+      border: 1px solid rgba(0, 243, 255, 0.3);
+      color: var(--neon);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.9rem;
+    }
+    
+    .file-upload-btn:hover {
+      background: rgba(0, 243, 255, 0.1);
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+    }
+    
+    /* Google Maps Section */
+    .maps-section {
+      margin-top: 3rem;
+      padding: 2rem var(--pad);
+    }
+    
+    .maps-container {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
+      border: 1px solid var(--card-border);
+      transition: all 0.4s;
+      position: relative;
+      overflow: hidden;
+    }
+    .maps-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,243,255,0.1));
+      transition: left 0.6s;
+      z-index: 1;
+    }
+    .maps-container:hover::before {
+      left: 100%;
+    }
+    .maps-container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0, 243, 255, 0.3);
+    }
+    
+    .maps-header {
+      padding: 2rem;
+      text-align: center;
+      border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+    }
+    
+    .maps-header h2 {
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      color: var(--neon);
+      margin-bottom: 0.5rem;
+    }
+    
+    .maps-header p {
+      opacity: 0.9;
+    }
+    
+    .maps-wrapper {
+      position: relative;
+      width: 100%;
+      height: 0;
+      padding-bottom: 45%;
+    }
+    
+    .maps-iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    
+    .maps-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 10, 42, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 2;
+    }
+    
+    .maps-container:hover .maps-overlay {
+      opacity: 1;
+    }
+    
+    /* Footer */
+    footer { 
+      text-align: center; 
+      padding: clamp(2rem, 3vw, 3rem) var(--pad); 
+      background: rgba(0,0,0,0.4); 
+      font-size: clamp(0.85rem, 1.5vw, 1rem); 
+      color: #ccc; 
+      backdrop-filter: blur(5px); 
+      margin-top: 2rem;
+      position: relative;
+    }
+    footer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to top, rgba(0,243,255,0.05), transparent);
+    }
+
+    /* Scroll to Top Button */
+    .scroll-to-top {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      background: var(--neon);
+      color: var(--bg1);
+      border: none;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0,243,255,0.5);
+      transition: all 0.3s;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+    }
+    .scroll-to-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+    .scroll-to-top:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 25px var(--neon);
+    }
+
+    /* Loading Animation */
+    .loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s, visibility 0.5s;
+    }
+    .loading.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 5px solid rgba(0,243,255,0.3);
+      border-top: 5px solid var(--neon);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    /* In-app notifications */
+    .in-app-notification {
+      position: fixed;
+      top: 100px;
+      right: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--neon);
+      border-radius: 8px;
+      padding: 1rem;
+      max-width: 300px;
+      z-index: 10000;
+      animation: slideInRight 0.3s ease-out;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    @keyframes slideInRight {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .notification-content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .notification-content strong {
+      color: var(--neon);
+    }
+
+    /* Menu Card Styles untuk Mobile */
+    .mobile-menu-cards {
+      display: none;
+      position: fixed;
+      top: 70px;
+      right: 15px;
+      width: 150px;
+      background: rgba(10, 10, 42, 0.95);
+      backdrop-filter: blur(15px);
+      border: 1px solid var(--neon);
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0, 243, 255, 0.2);
+      z-index: 999;
+      padding: 0.8rem;
+      animation: slideDown 0.3s ease-out;
+    }
+    
+    @keyframes slideDown {
+      from { 
+        opacity: 0;
+        transform: translateY(-20px); 
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0); 
+      }
+    }
+    
+    .mobile-menu-cards.active {
+      display: block;
+    }
+    
+    .menu-cards-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .menu-card {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.7rem 0.5rem;
+      border-radius: 8px;
+      background: transparent;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--text);
+    }
+    
+    .menu-card:hover, .menu-card.active {
+      background: rgba(0, 243, 255, 0.1);
+    }
+    
+    .menu-card i {
+      font-size: 1rem;
+      width: 20px;
+      text-align: center;
+      color: var(--neon);
+      transition: all 0.3s ease;
+    }
+    
+    .menu-card.active i, .menu-card:hover i {
+      transform: scale(1.2);
+      text-shadow: 0 0 8px var(--neon);
+    }
+    
+    .menu-card span {
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .menu-card.active span, .menu-card:hover span {
+      color: var(--neon);
+    }
+    
+    /* Enhanced Card Animation untuk Mobile */
+    .mobile-card-hover {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .mobile-card-hover::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,243,255,0.1), transparent);
+      transition: left 0.6s;
+    }
+    
+    .mobile-card-hover:hover::before {
+      left: 100%;
+    }
+
+    /* Screen reader only */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Offline indicator */
+    .offline-indicator {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: var(--warning);
+      color: var(--bg1);
+      text-align: center;
+      padding: 0.5rem;
+      z-index: 10001;
+      font-weight: bold;
+      transform: translateY(-100%);
+      transition: transform 0.3s ease;
+    }
+    
+    .offline-indicator.show {
+      transform: translateY(0);
+    }
+
+    /* Animations */
+    @keyframes glow {
+      from { text-shadow: 0 0 20px var(--neon); }
+      to { text-shadow: 0 0 30px var(--neon), 0 0 40px var(--purple); }
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fade-in {
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      /* Sembunyikan menu desktop dan hamburger */
+      nav {
+        display: none;
+      }
+      
+      .mobile-menu-btn {
+        display: none;
+      }
+      
+      /* Tampilkan tombol plus di kanan atas */
+      .mobile-plus-btn {
+        display: flex;
+      }
+      
+      .contact-grid { 
+        grid-template-columns: 1fr; 
+        gap: 2rem; 
+      } 
+      .contact-form { 
+        padding: 1.5rem; 
+      }
+      .maps-section {
+        margin-top: 2rem;
+        padding: 1.5rem var(--pad);
+      }
+      .maps-wrapper {
+        padding-bottom: 70%;
+      }
+      
+      .chat-section {
+        margin-top: 2rem;
+        padding: 1.5rem var(--pad);
+      }
+      
+      .chat-messages {
+        height: 300px;
+      }
+      
+      .chat-message {
+        max-width: 90%;
+      }
+      
+      .scroll-to-top {
+        bottom: 80px;
+        right: 20px;
+        width: 45px;
+        height: 45px;
+        font-size: 1rem;
+      }
+      
+      .chat-controls {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+      
+      .chat-input-wrapper {
+        flex-direction: column;
+      }
+      
+      /* Menu Cards untuk Mobile */
+      .mobile-menu-cards {
+        display: none;
+      }
+      
+      .mobile-menu-cards.active {
+        display: block;
+      }
+      
+      /* Adjust footer padding untuk mobile dengan menu cards */
+      footer {
+        padding-bottom: clamp(2rem, 3vw, 3rem);
+      }
+      
+      .in-app-notification {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+      }
+    }
+    
+    @media (max-width: 576px) { 
+      .contact-heading h1 { 
+        font-size: 2rem; 
+      } 
+      .contact-heading p { 
+        font-size: 1rem; 
+      } 
+      .info-card {
+        padding: 1.5rem;
+      }
+      .social-links {
+        justify-content: center;
+      }
+    }
+    
+    @media (min-width: 1601px) { 
+      --gap: 6rem; 
+      --pad: 8%; 
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Offline Indicator -->
+  <div class="offline-indicator" id="offlineIndicator">
+    <i class="fas fa-wifi"></i> Anda sedang offline. Beberapa fitur mungkin tidak tersedia.
+  </div>
+
+  <canvas id="galaxy"></canvas>
+
+  <!-- Header -->
+  <header id="navbar">
+    <div class="logo">ARIF</div>
+    
+    <!-- Tombol Plus untuk Mobile -->
+    <button class="mobile-plus-btn" id="mobilePlusBtn">
+      <i class="fas fa-plus"></i>
+    </button>
+    
+    <!-- Navigasi Desktop -->
+    <nav id="mainNav">
+      <ul>
+        <li><a href="index.html" data-page="beranda">Beranda</a></li>
+        <li><a href="berita.html" data-page="berita">Berita</a></li>
+        <li><a href="tentang.html" data-page="tentang">Tentang</a></li>
+        <li><a href="kontak.html" data-page="kontak" class="active">Kontak</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Contact Hero Section -->
+  <section class="contact-hero">
+    <div class="contact-container">
+      <div class="contact-heading fade-in">
+        <h1>Hubungi Kami</h1>
+        <p>Mari terhubung dalam Teknologi. Tim kami siap membantu Anda menjelajahi masa depan teknologi terdesentralisasi.</p>
+      </div>
+      
+      <div class="contact-grid">
+        <div class="contact-form fade-in">
+          <!-- Alert Messages -->
+          <div class="alert alert-success" id="successAlert">
+            <i class="fas fa-check-circle"></i> <span>Pesan berhasil dikirim! Kami akan membalasnya segera.</span>
+          </div>
+          
+          <div class="alert alert-error" id="errorAlert">
+            <i class="fas fa-exclamation-circle"></i> <span>Terjadi kesalahan. Silakan coba lagi atau hubungi kami langsung.</span>
+          </div>
+          
+          <div class="alert alert-warning" id="warningAlert">
+            <i class="fas fa-exclamation-triangle"></i> <span>Silakan lengkapi semua field yang diperlukan dengan benar.</span>
+          </div>
+          
+          <form id="contactForm">
+            <div class="form-group">
+              <label for="name">Nama Lengkap</label>
+              <input type="text" id="name" name="from_name" class="form-control" required>
+              <span class="validation-message" id="nameValidation"></span>
+            </div>
+            
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="from_email" class="form-control" required>
+              <span class="validation-message" id="emailValidation"></span>
+            </div>
+            
+            <div class="form-group">
+              <label for="phone">Telepon</label>
+              <input type="tel" id="phone" name="phone" class="form-control">
+              <span class="validation-message" id="phoneValidation"></span>
+            </div>
+            
+            <div class="form-group">
+              <label for="subject">Subjek</label>
+              <input type="text" id="subject" name="subject" class="form-control" required>
+              <span class="validation-message" id="subjectValidation"></span>
+            </div>
+            
+            <div class="form-group">
+              <label for="message">Pesan</label>
+              <textarea id="message" name="message" class="form-control" required maxlength="1000"></textarea>
+              <div class="char-counter" id="charCounter">0/1000 karakter</div>
+              <span class="validation-message" id="messageValidation"></span>
+            </div>
+            
+            <button type="submit" class="btn" id="submitBtn">Kirim Pesan</button>
+          </form>
+        </div>
+        
+        <div class="contact-info">
+          <div class="info-card fade-in">
+            <h3>Informasi Kontak</h3>
+            <p><strong>Email:</strong> <a href="mailto:febrian0532e@gmail.com">febrian0532e@gmail.com</a></p>
+            <p><strong>Telepon:</strong> <a href="tel:+6287766933236">+62 877 669 332 36</a></p>
+            <p><strong>Alamat:</strong> Surakarta, Jawa Tengah, Indonesia</p>
+          </div>
+          
+          <div class="info-card fade-in">
+            <h3>Jam Operasional</h3>
+            <p><strong>Senin - Jumat:</strong> 09:00 - 18:00 WIB</p>
+            <p><strong>Sabtu:</strong> 09:00 - 14:00 WIB</p>
+            <p><strong>Minggu:</strong> Tutup</p>
+          </div>
+          
+          <div class="info-card fade-in">
+            <h3>Ikuti Kami</h3>
+            <p>Terhubung dengan kami di media sosial untuk update terbaru tentang Teknologi.</p>
+            <div class="social-links">
+              <a href="#" class="social-link" aria-label="Twitter" data-social="twitter">
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a href="#" class="social-link" aria-label="LinkedIn" data-social="linkedin">
+                <i class="fab fa-linkedin-in"></i>
+              </a>
+              <a href="#" class="social-link" aria-label="GitHub" data-social="github">
+                <i class="fab fa-github"></i>
+              </a>
+              <a href="#" class="social-link" aria-label="Discord" data-social="discord">
+                <i class="fab fa-discord"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chat Container Section (Awalnya disembunyikan) -->
+  <section class="chat-section" id="chatSection">
+    <div class="chat-container fade-in">
+      <div class="chat-header">
+        <h2>Riwayat Percakapan</h2>
+        <p>Lihat dan lanjutkan percakapan Anda dengan tim ARIF Galaxy Web3</p>
+      </div>
+      
+      <div class="chat-controls">
+        <div class="chat-actions">
+          <button class="chat-action-btn" id="refreshChatBtn">
+            <i class="fas fa-sync-alt"></i> Refresh
+          </button>
+          <button class="chat-action-btn" id="clearChatBtn">
+            <i class="fas fa-trash"></i> Hapus Riwayat
+          </button>
+          <button class="chat-action-btn" id="exportChatBtn">
+            <i class="fas fa-download"></i> Ekspor
+          </button>
+          <input type="file" id="fileInput" style="display: none;" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx">
+          <button class="file-upload-btn" id="fileUploadBtn">
+            <i class="fas fa-paperclip"></i> File
+          </button>
+        </div>
+        
+        <div class="chat-status">
+          <div class="status-indicator" id="connectionStatus"></div>
+          <span id="connectionText">Online - Balasan dalam 24 jam</span>
+        </div>
+      </div>
+      
+      <div class="chat-messages" id="chatMessages">
+        <!-- Messages will be loaded here -->
+        <div class="empty-chat" id="emptyChat">
+          <i class="fas fa-comments" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+          <p>Belum ada percakapan. Mulai percakapan dengan mengirim pesan di atas!</p>
+        </div>
+      </div>
+      
+      <div class="chat-input-area" id="chatInputArea">
+        <div class="chat-input-wrapper">
+          <input type="text" class="chat-input" id="chatInput" placeholder="Ketik pesan Anda di sini...">
+          <button class="chat-send-btn" id="chatSendBtn">
+            <i class="fas fa-paper-plane"></i> Kirim
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Google Maps Section -->
+  <section class="maps-section">
+    <div class="maps-container fade-in">
+      <div class="maps-header">
+        <h2>Lokasi</h2>
+        <p>Rumah Saya Ke Gempit Gedung</p>
+      </div>
+      <div class="maps-wrapper">
+        <iframe 
+          class="maps-iframe"
+          data-src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3955.146284257729!2d110.81431157500757!3d-7.566685992457362!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e7a170e2c5d6e3b%3A0x3a0e6f6f7b0f8e3a!2sUniversitas%20Kusuma%20Husada%20Surakarta!5e0!3m2!1sid!2sid!4v1710412345678!5m2!1sid!2sid" 
+          allowfullscreen="" 
+          loading="lazy" 
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+        <div class="maps-overlay">
+          <div class="btn">Lihat Peta Lebih Besar</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>© 2025 Owner labeled as Al-generated</footer>
+
+  <!-- Mobile Menu Cards -->
+  <div class="mobile-menu-cards" id="mobileMenuCards">
+    <div class="menu-cards-container">
+      <a href="index.html" class="menu-card mobile-card-hover" data-page="beranda">
+        <i class="fas fa-home"></i>
+        <span>Beranda</span>
+      </a>
+      <a href="berita.html" class="menu-card mobile-card-hover" data-page="berita">
+        <i class="fas fa-newspaper"></i>
+        <span>Berita</span>
+      </a>
+      <a href="tentang.html" class="menu-card mobile-card-hover" data-page="tentang">
+        <i class="fas fa-info-circle"></i>
+        <span>Tentang</span>
+      </a>
+      <a href="kontak.html" class="menu-card mobile-card-hover active" data-page="kontak">
+        <i class="fas fa-envelope"></i>
+        <span>Kontak</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Scroll to Top Button -->
+  <button class="scroll-to-top" id="scrollToTop">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <!-- Screen Reader Announcements -->
+  <div id="screenReaderAnnouncer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+  <script>
+    // =============================================
+    // FIREBASE CONFIGURATION (Untuk Chat Real-time)
+    // =============================================
+    
+    // Firebase configuration - Ganti dengan konfigurasi project Anda
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    
+    // Initialize Firebase
+    let firebaseInitialized = false;
+    try {
+      firebase.initializeApp(firebaseConfig);
+      firebaseInitialized = true;
+      console.log("Firebase initialized successfully");
+    } catch (error) {
+      console.error("Firebase initialization error:", error);
+      // Fallback ke localStorage jika Firebase gagal
+    }
+    
+    // Initialize Firestore
+    const db = firebaseInitialized ? firebase.firestore() : null;
+    
+    // =============================================
+    // EMAILJS CONFIGURATION
+    // =============================================
+    
+    // Initialize EmailJS with your Public Key
+    // Replace with your actual EmailJS Public Key
+    emailjs.init("YOUR_PUBLIC_KEY_HERE");
+    
+    // EmailJS Service and Template IDs
+    const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID_HERE";
+    const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID_HERE";
+    
+    // reCAPTCHA Configuration
+    const RECAPTCHA_SITE_KEY = "YOUR_RECAPTCHA_SITE_KEY_HERE";
+    
+    // =============================================
+    // CHAT SYSTEM CONFIGURATION
+    // =============================================
+    
+    // LocalStorage keys
+    const CHAT_STORAGE_KEY = 'arif_galaxy_chat_history';
+    const USER_ID_KEY = 'arif_galaxy_user_id';
+    
+    // Generate or retrieve user ID
+    let userId = localStorage.getItem(USER_ID_KEY);
+    if (!userId) {
+      userId = 'user_' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem(USER_ID_KEY, userId);
+    }
+    
+    // Chat management
+    let chatHistory = [];
+    let isTyping = false;
+    let typingTimer;
+    
+    // DOM Elements for chat
+    const chatSection = document.getElementById('chatSection');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const chatSendBtn = document.getElementById('chatSendBtn');
+    const refreshChatBtn = document.getElementById('refreshChatBtn');
+    const clearChatBtn = document.getElementById('clearChatBtn');
+    const exportChatBtn = document.getElementById('exportChatBtn');
+    const fileInput = document.getElementById('fileInput');
+    const fileUploadBtn = document.getElementById('fileUploadBtn');
+    const chatInputArea = document.getElementById('chatInputArea');
+    const emptyChat = document.getElementById('emptyChat');
+    const connectionStatus = document.getElementById('connectionStatus');
+    const connectionText = document.getElementById('connectionText');
+    
+    // =============================================
+    // SECURITY CONFIGURATION
+    // =============================================
+    
+    // Rate limiting to prevent spam
+    let lastSubmissionTime = 0;
+    const MIN_SUBMISSION_INTERVAL = 30000; // 30 seconds
+    
+    // Rate limiting untuk chat
+    const submissionLimits = new Map();
+    
+    // Input validation patterns
+    const validationPatterns = {
+      name: /^[a-zA-Z\s]{2,50}$/,
+      email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      phone: /^[\d\s\-()+]{10,20}$/,
+      subject: /^.{5,100}$/,
+      message: /^.{10,1000}$/
+    };
+    
+    // Validation messages
+    const validationMessages = {
+      name: {
+        required: "Nama harus diisi",
+        pattern: "Nama harus terdiri dari 2-50 karakter huruf dan spasi"
+      },
+      email: {
+        required: "Email harus diisi",
+        pattern: "Format email tidak valid"
+      },
+      phone: {
+        pattern: "Format telepon tidak valid"
+      },
+      subject: {
+        required: "Subjek harus diisi",
+        pattern: "Subjek harus terdiri dari 5-100 karakter"
+      },
+      message: {
+        required: "Pesan harus diisi",
+        pattern: "Pesan harus terdiri dari 10-1000 karakter"
+      }
+    };
+    
+    // =============================================
+    // ANALYTICS AND TRACKING
+    // =============================================
+    
+    // Track user interactions
+    function trackEvent(category, action, label) {
+      // Simpan ke localStorage untuk analytics internal
+      const analytics = JSON.parse(localStorage.getItem('arif_analytics') || '[]');
+      analytics.push({
+        timestamp: Date.now(),
+        category,
+        action,
+        label,
+        userId: userId
+      });
+      localStorage.setItem('arif_analytics', JSON.stringify(analytics));
+      
+      // Jika Google Analytics tersedia
+      if (typeof gtag !== 'undefined') {
+        gtag('event', action, {
+          'event_category': category,
+          'event_label': label
+        });
+      }
+      
+      console.log(`Event tracked: ${category} - ${action} - ${label}`);
+    }
+    
+    // =============================================
+    // ACCESSIBILITY FUNCTIONS
+    // =============================================
+    
+    // Screen reader announcements
+    function announceToScreenReader(message) {
+      const announcer = document.getElementById('screenReaderAnnouncer');
+      announcer.textContent = message;
+      
+      // Clear after a delay
+      setTimeout(() => {
+        announcer.textContent = '';
+      }, 1000);
+    }
+    
+    // =============================================
+    // PERFORMANCE OPTIMIZATION
+    // =============================================
+    
+    // Debounce function untuk optimasi performance
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+    
+    // Lazy loading untuk Google Maps
+    function initMap() {
+      const mapFrame = document.querySelector('.maps-iframe');
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          mapFrame.src = mapFrame.dataset.src;
+          observer.unobserve(mapFrame);
+        }
+      });
+      
+      observer.observe(mapFrame);
+    }
+    
+    // =============================================
+    // OFFLINE SUPPORT
+    // =============================================
+    
+    // Deteksi status koneksi
+    function updateOnlineStatus() {
+      const offlineIndicator = document.getElementById('offlineIndicator');
+      
+      if (navigator.onLine) {
+        offlineIndicator.classList.remove('show');
+        connectionStatus.style.background = 'var(--success)';
+        connectionStatus.style.boxShadow = '0 0 10px var(--success)';
+        connectionText.textContent = 'Online - Balasan dalam 24 jam';
+        
+        // Coba sinkronisasi data jika online
+        syncOfflineData();
+      } else {
+        offlineIndicator.classList.add('show');
+        connectionStatus.style.background = 'var(--warning)';
+        connectionStatus.style.boxShadow = '0 0 10px var(--warning)';
+        connectionText.textContent = 'Offline - Pesan akan dikirim saat online';
+      }
+    }
+    
+    // Sinkronisasi data offline
+    function syncOfflineData() {
+      // Implementasi sinkronisasi data offline ke server
+      const offlineMessages = JSON.parse(localStorage.getItem('arif_offline_messages') || '[]');
+      
+      if (offlineMessages.length > 0) {
+        console.log('Syncing offline messages:', offlineMessages);
+        // Kirim pesan offline ke server
+        // ...
+        
+        // Kosongkan setelah berhasil sinkronisasi
+        localStorage.removeItem('arif_offline_messages');
+      }
+    }
+    
+    // =============================================
+    // CHAT SYSTEM FUNCTIONS
+    // =============================================
+    
+    // Load chat history dari Firebase atau localStorage
+    async function loadChatHistory() {
+      if (firebaseInitialized) {
+        try {
+          // Load dari Firebase
+          const snapshot = await db.collection('chats')
+            .where('userId', '==', userId)
+            .orderBy('timestamp', 'asc')
+            .get();
+          
+          chatHistory = [];
+          snapshot.forEach(doc => {
+            chatHistory.push(doc.data());
+          });
+          
+          renderChatHistory();
+          
+          // Tampilkan chat section jika ada riwayat
+          if (chatHistory.length > 0) {
+            chatSection.style.display = 'block';
+          }
+        } catch (error) {
+          console.error('Error loading from Firebase:', error);
+          // Fallback ke localStorage
+          loadFromLocalStorage();
+        }
+      } else {
+        loadFromLocalStorage();
+      }
+    }
+    
+    // Load dari localStorage
+    function loadFromLocalStorage() {
+      const storedChat = localStorage.getItem(CHAT_STORAGE_KEY);
+      if (storedChat) {
+        chatHistory = JSON.parse(storedChat);
+        renderChatHistory();
+        // Tampilkan chat section jika ada riwayat
+        if (chatHistory.length > 0) {
+          chatSection.style.display = 'block';
+        }
+      }
+    }
+    
+    // Save chat history ke Firebase atau localStorage
+    async function saveChatHistory() {
+      if (firebaseInitialized) {
+        try {
+          // Simpan ke Firebase
+          const batch = db.batch();
+          
+          chatHistory.forEach(message => {
+            const docRef = db.collection('chats').doc(message.id);
+            batch.set(docRef, message);
+          });
+          
+          await batch.commit();
+        } catch (error) {
+          console.error('Error saving to Firebase:', error);
+          // Fallback ke localStorage
+          localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(chatHistory));
+        }
+      } else {
+        localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(chatHistory));
+      }
+    }
+    
+    // Render chat history ke UI
+    function renderChatHistory() {
+      chatMessages.innerHTML = '';
+      
+      if (chatHistory.length === 0) {
+        emptyChat.style.display = 'block';
+        return;
+      }
+      
+      emptyChat.style.display = 'none';
+      
+      chatHistory.forEach(message => {
+        const messageElement = createMessageElement(message);
+        chatMessages.appendChild(messageElement);
+      });
+      
+      // Scroll to bottom
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    // Create a message element
+    function createMessageElement(message) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `chat-message ${message.sender === 'user' ? 'user-message' : 'admin-message'}`;
+      
+      const messageHeader = document.createElement('div');
+      messageHeader.className = 'message-header';
+      
+      const messageSender = document.createElement('div');
+      messageSender.className = 'message-sender';
+      messageSender.textContent = message.sender === 'user' ? 'Anda' : 'ARIF Galaxy Web3';
+      
+      const messageTime = document.createElement('div');
+      messageTime.className = 'message-time';
+      messageTime.textContent = formatTimestamp(message.timestamp);
+      
+      const messageContent = document.createElement('div');
+      messageContent.className = 'message-content';
+      
+      if (message.type === 'file') {
+        messageContent.className += ' file-message';
+        messageContent.innerHTML = `
+          <i class="fas fa-file file-icon"></i>
+          <span>${message.content}</span>
+        `;
+      } else {
+        messageContent.textContent = message.content;
+      }
+      
+      messageHeader.appendChild(messageSender);
+      messageHeader.appendChild(messageTime);
+      messageDiv.appendChild(messageHeader);
+      messageDiv.appendChild(messageContent);
+      
+      return messageDiv;
+    }
+    
+    // Format timestamp untuk display
+    function formatTimestamp(timestamp) {
+      const date = new Date(timestamp);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      const diffDays = Math.floor(diffMs / 86400000);
+      
+      if (diffMins < 1) return 'Baru saja';
+      if (diffMins < 60) return `${diffMins} menit lalu`;
+      if (diffHours < 24) return `${diffHours} jam lalu`;
+      if (diffDays < 7) return `${diffDays} hari lalu`;
+      
+      return date.toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
+    }
+    
+    // Add a new message to the chat
+    async function addMessage(content, sender, type = 'text') {
+      const message = {
+        id: Date.now().toString(),
+        content: content,
+        sender: sender,
+        type: type,
+        timestamp: Date.now(),
+        userId: userId
+      };
+      
+      chatHistory.push(message);
+      
+      // Simpan ke Firebase atau localStorage
+      await saveChatHistory();
+      renderChatHistory();
+      
+      // Tampilkan chat section
+      chatSection.style.display = 'block';
+      
+      // Track event
+      trackEvent('chat', 'message_sent', type);
+      
+      // Jika itu pesan user, simulasi respons admin setelah delay
+      if (sender === 'user') {
+        simulateAdminResponse(content, type);
+      }
+    }
+    
+    // Simulate admin response (in a real app, this would be a server call)
+    function simulateAdminResponse(userMessage, type) {
+      // Tampilkan typing indicator
+      showTypingIndicator();
+      
+      // Simple response simulation - in a real app, this would be more sophisticated
+      setTimeout(() => {
+        hideTypingIndicator();
+        
+        const responses = [
+          "Terima kasih atas pesan Anda. Tim kami akan membalasnya dalam waktu 24 jam.",
+          "Pesan Anda telah kami terima. Apakah ada hal lain yang bisa kami bantu?",
+          "Kami telah mencatat pertanyaan Anda dan akan segera menghubungi Anda.",
+          "Terima kasih telah menghubungi ARIF Galaxy Web3. Kami menghargai masukan Anda.",
+          "Pesan Anda penting bagi kami. Kami akan segera menindaklanjutinya."
+        ];
+        
+        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+        addMessage(randomResponse, 'admin');
+        
+        // Tampilkan notifikasi
+        showInAppNotification("Pesan baru dari ARIF Galaxy Web3", randomResponse);
+      }, 2000 + Math.random() * 3000); // Random delay between 2-5 seconds
+    }
+    
+    // Typing indicator
+    function showTypingIndicator() {
+      const typingDiv = document.createElement('div');
+      typingDiv.className = 'typing-indicator';
+      typingDiv.id = 'typingIndicator';
+      typingDiv.innerHTML = `
+        <div class="typing-dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <span>Admin sedang mengetik...</span>
+      `;
+      
+      chatMessages.appendChild(typingDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    function hideTypingIndicator() {
+      const typingIndicator = document.getElementById('typingIndicator');
+      if (typingIndicator) {
+        typingIndicator.remove();
+      }
+    }
+    
+    // Clear chat history
+    async function clearChatHistory() {
+      if (confirm('Apakah Anda yakin ingin menghapus semua riwayat percakapan?')) {
+        chatHistory = [];
+        
+        if (firebaseInitialized) {
+          try {
+            // Hapus dari Firebase
+            const snapshot = await db.collection('chats')
+              .where('userId', '==', userId)
+              .get();
+            
+            const batch = db.batch();
+            snapshot.forEach(doc => {
+              batch.delete(doc.ref);
+            });
+            
+            await batch.commit();
+          } catch (error) {
+            console.error('Error deleting from Firebase:', error);
+          }
+        }
+        
+        // Hapus dari localStorage
+        localStorage.removeItem(CHAT_STORAGE_KEY);
+        renderChatHistory();
+        
+        // Sembunyikan chat section
+        chatSection.style.display = 'none';
+        
+        // Track event
+        trackEvent('chat', 'history_cleared', 'user_initiated');
+      }
+    }
+    
+    // Export chat history
+    function exportChatHistory() {
+      if (chatHistory.length === 0) {
+        showAlert('warning', 'Tidak ada riwayat percakapan untuk diekspor.');
+        return;
+      }
+      
+      let exportText = "RIWAYAT PERCAKAPAN - ARIF Galaxy Web3\n";
+      exportText += "Tanggal Ekspor: " + new Date().toLocaleDateString('id-ID') + "\n";
+      exportText += "User ID: " + userId + "\n\n";
+      
+      chatHistory.forEach(message => {
+        const sender = message.sender === 'user' ? 'Anda' : 'ARIF Galaxy Web3';
+        const timestamp = new Date(message.timestamp).toLocaleString('id-ID');
+        const type = message.type === 'file' ? '[FILE] ' : '';
+        exportText += `[${timestamp}] ${sender}: ${type}${message.content}\n`;
+      });
+      
+      const blob = new Blob([exportText], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `chat_history_${new Date().toISOString().split('T')[0]}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      // Track event
+      trackEvent('chat', 'history_exported', 'user_initiated');
+    }
+    
+    // File upload handler
+    function handleFileUpload(file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        showAlert('error', 'Ukuran file maksimal 5MB');
+        return;
+      }
+      
+      // Dalam implementasi nyata, file akan diupload ke server
+      // Di sini kita hanya mensimulasikan
+      addMessage(file.name, 'user', 'file');
+      
+      // Track event
+      trackEvent('chat', 'file_uploaded', file.type);
+    }
+    
+    // In-app notification
+    function showInAppNotification(title, message) {
+      // Cek apakah notifikasi didukung
+      if ("Notification" in window && Notification.permission === "granted") {
+        new Notification(title, {
+          body: message,
+          icon: "/favicon.ico"
+        });
+      }
+      
+      // Juga tampilkan notifikasi dalam aplikasi
+      const notification = document.createElement('div');
+      notification.className = 'in-app-notification';
+      notification.innerHTML = `
+        <div class="notification-content">
+          <strong>${title}</strong>
+          <p>${message}</p>
+        </div>
+      `;
+      
+      document.body.appendChild(notification);
+      
+      // Hapus setelah 5 detik
+      setTimeout(() => {
+        notification.remove();
+      }, 5000);
+    }
+    
+    // Rate limiting untuk chat
+    function checkRateLimit(identifier, limit = 5, windowMs = 60000) {
+      const now = Date.now();
+      const userLimits = submissionLimits.get(identifier) || [];
+      
+      // Hapus submission yang sudah expired
+      const validLimits = userLimits.filter(time => now - time < windowMs);
+      
+      if (validLimits.length >= limit) {
+        return false;
+      }
+      
+      validLimits.push(now);
+      submissionLimits.set(identifier, validLimits);
+      return true;
+    }
+    
+    // Content sanitization untuk chat
+    function sanitizeInput(input) {
+      const div = document.createElement('div');
+      div.textContent = input;
+      return div.innerHTML;
+    }
+    
+    // =============================================
+    // FORM VALIDATION AND SUBMISSION
+    // =============================================
+    
+    // DOM Elements
+    const form = document.getElementById('contactForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const originalBtnText = submitBtn.textContent;
+    const charCounter = document.getElementById('charCounter');
+    const messageTextarea = document.getElementById('message');
+    
+    // Form validation function
+    function validateForm() {
+      let isValid = true;
+      
+      // Validate name
+      const name = document.getElementById('name').value;
+      const nameValidation = document.getElementById('nameValidation');
+      const nameInput = document.getElementById('name');
+      
+      if (!name) {
+        showValidationError(nameInput, nameValidation, validationMessages.name.required);
+        isValid = false;
+      } else if (!validationPatterns.name.test(name)) {
+        showValidationError(nameInput, nameValidation, validationMessages.name.pattern);
+        isValid = false;
+      } else {
+        showValidationSuccess(nameInput, nameValidation);
+      }
+      
+      // Validate email
+      const email = document.getElementById('email').value;
+      const emailValidation = document.getElementById('emailValidation');
+      const emailInput = document.getElementById('email');
+      
+      if (!email) {
+        showValidationError(emailInput, emailValidation, validationMessages.email.required);
+        isValid = false;
+      } else if (!validationPatterns.email.test(email)) {
+        showValidationError(emailInput, emailValidation, validationMessages.email.pattern);
+        isValid = false;
+      } else {
+        showValidationSuccess(emailInput, emailValidation);
+      }
+      
+      // Validate phone (optional)
+      const phone = document.getElementById('phone').value;
+      const phoneValidation = document.getElementById('phoneValidation');
+      const phoneInput = document.getElementById('phone');
+      
+      if (phone && !validationPatterns.phone.test(phone)) {
+        showValidationError(phoneInput, phoneValidation, validationMessages.phone.pattern);
+        isValid = false;
+      } else if (phone) {
+        showValidationSuccess(phoneInput, phoneValidation);
+      } else {
+        phoneInput.classList.remove('invalid', 'valid');
+        phoneValidation.textContent = '';
+        phoneValidation.classList.remove('invalid', 'valid');
+      }
+      
+      // Validate subject
+      const subject = document.getElementById('subject').value;
+      const subjectValidation = document.getElementById('subjectValidation');
+      const subjectInput = document.getElementById('subject');
+      
+      if (!subject) {
+        showValidationError(subjectInput, subjectValidation, validationMessages.subject.required);
+        isValid = false;
+      } else if (!validationPatterns.subject.test(subject)) {
+        showValidationError(subjectInput, subjectValidation, validationMessages.subject.pattern);
+        isValid = false;
+      } else {
+        showValidationSuccess(subjectInput, subjectValidation);
+      }
+      
+      // Validate message
+      const message = document.getElementById('message').value;
+      const messageValidation = document.getElementById('messageValidation');
+      const messageInput = document.getElementById('message');
+      
+      if (!message) {
+        showValidationError(messageInput, messageValidation, validationMessages.message.required);
+        isValid = false;
+      } else if (!validationPatterns.message.test(message)) {
+        showValidationError(messageInput, messageValidation, validationMessages.message.pattern);
+        isValid = false;
+      } else {
+        showValidationSuccess(messageInput, messageValidation);
+      }
+      
+      return isValid;
+    }
+    
+    // Show validation error
+    function showValidationError(input, validationElement, message) {
+      input.classList.remove('valid');
+      input.classList.add('invalid');
+      validationElement.textContent = message;
+      validationElement.classList.remove('valid');
+      validationElement.classList.add('invalid');
+    }
+    
+    // Show validation success
+    function showValidationSuccess(input, validationElement) {
+      input.classList.remove('invalid');
+      input.classList.add('valid');
+      validationElement.textContent = '✓ Valid';
+      validationElement.classList.remove('invalid');
+      validationElement.classList.add('valid');
+    }
+    
+    // Real-time validation
+    document.getElementById('name').addEventListener('blur', function() {
+      const name = this.value;
+      const nameValidation = document.getElementById('nameValidation');
+      
+      if (!name) {
+        showValidationError(this, nameValidation, validationMessages.name.required);
+      } else if (!validationPatterns.name.test(name)) {
+        showValidationError(this, nameValidation, validationMessages.name.pattern);
+      } else {
+        showValidationSuccess(this, nameValidation);
+      }
+    });
+    
+    document.getElementById('email').addEventListener('blur', function() {
+      const email = this.value;
+      const emailValidation = document.getElementById('emailValidation');
+      
+      if (!email) {
+        showValidationError(this, emailValidation, validationMessages.email.required);
+      } else if (!validationPatterns.email.test(email)) {
+        showValidationError(this, emailValidation, validationMessages.email.pattern);
+      } else {
+        showValidationSuccess(this, emailValidation);
+      }
+    });
+    
+    document.getElementById('phone').addEventListener('blur', function() {
+      const phone = this.value;
+      const phoneValidation = document.getElementById('phoneValidation');
+      
+      if (phone && !validationPatterns.phone.test(phone)) {
+        showValidationError(this, phoneValidation, validationMessages.phone.pattern);
+      } else if (phone) {
+        showValidationSuccess(this, phoneValidation);
+      } else {
+        this.classList.remove('invalid', 'valid');
+        phoneValidation.textContent = '';
+        phoneValidation.classList.remove('invalid', 'valid');
+      }
+    });
+    
+    document.getElementById('subject').addEventListener('blur', function() {
+      const subject = this.value;
+      const subjectValidation = document.getElementById('subjectValidation');
+      
+      if (!subject) {
+        showValidationError(this, subjectValidation, validationMessages.subject.required);
+      } else if (!validationPatterns.subject.test(subject)) {
+        showValidationError(this, subjectValidation, validationMessages.subject.pattern);
+      } else {
+        showValidationSuccess(this, subjectValidation);
+      }
+    });
+    
+    document.getElementById('message').addEventListener('blur', function() {
+      const message = this.value;
+      const messageValidation = document.getElementById('messageValidation');
+      
+      if (!message) {
+        showValidationError(this, messageValidation, validationMessages.message.required);
+      } else if (!validationPatterns.message.test(message)) {
+        showValidationError(this, messageValidation, validationMessages.message.pattern);
+      } else {
+        showValidationSuccess(this, messageValidation);
+      }
+    });
+    
+    // Phone number masking
+    document.getElementById('phone').addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 0) {
+        value = value.match(/(\d{0,3})(\d{0,4})(\d{0,4})/);
+        e.target.value = !value[2] ? value[1] : value[1] + '-' + value[2] + (value[3] ? '-' + value[3] : '');
+      }
+    });
+    
+    // Character counter untuk pesan
+    messageTextarea.addEventListener('input', function() {
+      const count = this.value.length;
+      charCounter.textContent = `${count}/1000 karakter`;
+      
+      if (count > 900) {
+        charCounter.style.color = 'var(--warning)';
+      } else if (count > 1000) {
+        charCounter.style.color = 'var(--error)';
+      } else {
+        charCounter.style.color = 'var(--success)';
+      }
+    });
+    
+    // Form submission
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      // Track event
+      trackEvent('contact', 'form_submit_attempt', 'contact_form');
+      
+      // Validate inputs
+      if (!validateForm()) {
+        showAlert('warning', 'Silakan lengkapi semua field yang diperlukan dengan benar.');
+        trackEvent('contact', 'form_validation_failed', 'contact_form');
+        return;
+      }
+      
+      // Rate limiting check
+      const now = Date.now();
+      if (now - lastSubmissionTime < MIN_SUBMISSION_INTERVAL) {
+        showAlert('error', 'Silakan tunggu beberapa saat sebelum mengirim pesan lagi.');
+        trackEvent('contact', 'rate_limit_exceeded', 'contact_form');
+        return;
+      }
+      
+      // Show sending state
+      submitBtn.textContent = 'Mengirim...';
+      submitBtn.disabled = true;
+      
+      try {
+        // Execute reCAPTCHA
+        const recaptchaToken = await executeRecaptcha();
+        
+        // Prepare form data
+        const formData = {
+          from_name: document.getElementById('name').value,
+          from_email: document.getElementById('email').value,
+          phone: document.getElementById('phone').value,
+          subject: document.getElementById('subject').value,
+          message: document.getElementById('message').value,
+          'g-recaptcha-response': recaptchaToken,
+          timestamp: new Date().toLocaleString('id-ID'),
+          user_id: userId
+        };
+        
+        // Send email using EmailJS
+        const response = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, formData);
+        
+        console.log('SUCCESS!', response.status, response.text);
+        
+        // Update last submission time
+        lastSubmissionTime = Date.now();
+        
+        // Add message to chat history
+        addMessage(document.getElementById('message').value, 'user');
+        
+        // Show success state
+        showAlert('success', 'Pesan berhasil dikirim! Kami akan membalasnya segera.');
+        submitBtn.textContent = 'Pesan Terkirim!';
+        submitBtn.classList.add('btn-success');
+        
+        // Track successful submission
+        trackEvent('contact', 'form_submit_success', 'contact_form');
+        
+        // Reset form
+        form.reset();
+        
+        // Reset validation states
+        document.querySelectorAll('.form-control').forEach(input => {
+          input.classList.remove('valid', 'invalid');
+        });
+        document.querySelectorAll('.validation-message').forEach(span => {
+          span.textContent = '';
+          span.classList.remove('valid', 'invalid');
+        });
+        
+        // Reset character counter
+        charCounter.textContent = '0/1000 karakter';
+        charCounter.style.color = 'var(--success)';
+        
+        // Reset button after 5 seconds
+        setTimeout(() => {
+          submitBtn.textContent = originalBtnText;
+          submitBtn.disabled = false;
+          submitBtn.classList.remove('btn-success');
+        }, 5000);
+        
+      } catch (error) {
+        console.log('FAILED...', error);
+        
+        // Show error state
+        showAlert('error', 'Terjadi kesalahan. Silakan coba lagi atau hubungi kami langsung.');
+        submitBtn.textContent = 'Gagal Mengirim!';
+        submitBtn.classList.add('btn-error');
+        
+        // Track failed submission
+        trackEvent('contact', 'form_submit_failed', 'contact_form');
+        
+        // Reset button after 5 seconds
+        setTimeout(() => {
+          submitBtn.textContent = originalBtnText;
+          submitBtn.disabled = false;
+          submitBtn.classList.remove('btn-error');
+        }, 5000);
+      }
+    });
+    
+    // reCAPTCHA execution
+    function executeRecaptcha() {
+      return new Promise((resolve, reject) => {
+        if (typeof grecaptcha === 'undefined') {
+          // Fallback if reCAPTCHA fails to load
+          console.warn('reCAPTCHA not loaded, proceeding without it');
+          resolve('bypass');
+          return;
+        }
+        
+        grecaptcha.ready(function() {
+          grecaptcha.execute(RECAPTCHA_SITE_KEY, {action: 'contact'})
+            .then(function(token) {
+              resolve(token);
+            })
+            .catch(function(error) {
+              console.error('reCAPTCHA error:', error);
+              reject(error);
+            });
+        });
+      });
+    }
+    
+    // Alert display function
+    function showAlert(type, message) {
+      const successAlert = document.getElementById('successAlert');
+      const errorAlert = document.getElementById('errorAlert');
+      const warningAlert = document.getElementById('warningAlert');
+      
+      // Hide all alerts first
+      successAlert.style.display = 'none';
+      errorAlert.style.display = 'none';
+      warningAlert.style.display = 'none';
+      
+      // Show the appropriate alert
+      if (type === 'success') {
+        successAlert.querySelector('span').textContent = message;
+        successAlert.style.display = 'flex';
+        announceToScreenReader(message);
+      } else if (type === 'error') {
+        errorAlert.querySelector('span').textContent = message;
+        errorAlert.style.display = 'flex';
+        announceToScreenReader(message);
+      } else if (type === 'warning') {
+        warningAlert.querySelector('span').textContent = message;
+        warningAlert.style.display = 'flex';
+        announceToScreenReader(message);
+      }
+      
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        successAlert.style.display = 'none';
+        errorAlert.style.display = 'none';
+        warningAlert.style.display = 'none';
+      }, 5000);
+    }
+    
+    // =============================================
+    // EXISTING FUNCTIONALITY
+    // =============================================
+    
+    // Loading Screen
+    window.addEventListener('load', () => {
+      const loading = document.getElementById('loading');
+      setTimeout(() => {
+        loading.classList.add('hidden');
+        
+        // Inisialisasi setelah loading selesai
+        initMap();
+        loadChatHistory();
+        updateOnlineStatus();
+        
+        // Track page view
+        trackEvent('navigation', 'page_view', 'contact_page');
+      }, 1000);
+    });
+
+    // Mobile Plus Button Toggle
+    const mobilePlusBtn = document.getElementById('mobilePlusBtn');
+    const mobileMenuCards = document.getElementById('mobileMenuCards');
+    
+    mobilePlusBtn.addEventListener('click', () => {
+      mobilePlusBtn.classList.toggle('active');
+      mobileMenuCards.classList.toggle('active');
+      
+      // Track event
+      trackEvent('navigation', 'mobile_menu_toggle', mobileMenuCards.classList.contains('active') ? 'opened' : 'closed');
+    });
+
+    // Close mobile menu cards when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!mobileMenuCards.contains(e.target) && !mobilePlusBtn.contains(e.target)) {
+        mobilePlusBtn.classList.remove('active');
+        mobileMenuCards.classList.remove('active');
+      }
+    });
+
+    // Scroll Effects
+    const debouncedScroll = debounce(() => {
+      const navbar = document.getElementById('navbar');
+      const scrollToTop = document.getElementById('scrollToTop');
+      
+      // Navbar background change on scroll
+      if (window.scrollY > 60) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+      
+      // Show/hide scroll to top button
+      if (window.scrollY > 500) {
+        scrollToTop.classList.add('visible');
+      } else {
+        scrollToTop.classList.remove('visible');
+      }
+      
+      // Animate elements on scroll
+      animateOnScroll();
+    }, 10);
+    
+    window.addEventListener('scroll', debouncedScroll);
+
+    // Scroll to Top Functionality
+    document.getElementById('scrollToTop').addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+      
+      // Track event
+      trackEvent('navigation', 'scroll_to_top', 'user_initiated');
+    });
+
+    // Animate elements on scroll
+    function animateOnScroll() {
+      const fadeElements = document.querySelectorAll('.fade-in');
+      
+      fadeElements.forEach(element => {
+        const elementTop = element.getBoundingClientRect().top;
+        const elementVisible = 150;
+        
+        if (elementTop < window.innerHeight - elementVisible) {
+          element.style.opacity = '1';
+          element.style.transform = 'translateY(0)';
+        }
+      });
+    }
+
+    // Initialize fade-in elements
+    document.querySelectorAll('.fade-in').forEach(element => {
+      element.style.opacity = '0';
+      element.style.transform = 'translateY(30px)';
+      element.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+    });
+    
+    // Maps Interaction
+    document.querySelector('.maps-overlay .btn').addEventListener('click', function() {
+      window.open('https://www.google.com/maps/place/Universitas+Kusuma+Husada+Surakarta/@-7.566686,110.8143116,17z/data=!3m1!4b1!4m6!3m5!1s0x2e7a170e2c5d6e3b:0x3a0e6f6f7b0f8e3a!8m2!3d-7.566686!4d110.8168865!16s%2Fg%2F1tgb1l2f?entry=ttu', '_blank');
+      
+      // Track event
+      trackEvent('maps', 'view_larger_map', 'user_initiated');
+    });
+
+    // NAV AKTIF OTOMATIS
+    const currentPage = location.pathname.split('/').pop().replace('.html', '') || 'beranda';
+    document.querySelectorAll('nav a, .menu-card').forEach(link => {
+      if (link.getAttribute('data-page') === currentPage) {
+        link.classList.add('active');
+      }
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelectorAll('nav a, .menu-card').forEach(a => a.classList.remove('active'));
+        link.classList.add('active');
+        
+        // Track navigation
+        trackEvent('navigation', 'menu_click', link.getAttribute('data-page'));
+        
+        // Tutup menu mobile setelah memilih
+        mobilePlusBtn.classList.remove('active');
+        mobileMenuCards.classList.remove('active');
+        
+        setTimeout(() => window.location.href = link.href, 200);
+      });
+    });
+
+    // Social media tracking
+    document.querySelectorAll('.social-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const platform = link.getAttribute('data-social');
+        trackEvent('social', 'click', platform);
+        
+        // Simulate opening social media (in a real app, this would actually navigate)
+        showAlert('info', `Membuka ${platform}... (simulasi)`);
+      });
+    });
+
+    // Add hover effects for mobile cards
+    document.querySelectorAll('.menu-card').forEach(card => {
+      card.addEventListener('touchstart', function() {
+        this.classList.add('hover');
+      });
+      
+      card.addEventListener('touchend', function() {
+        this.classList.remove('hover');
+      });
+    });
+
+    // =============================================
+    // CHAT SYSTEM EVENT LISTENERS
+    // =============================================
+    
+    // Send message when button is clicked
+    chatSendBtn.addEventListener('click', () => {
+      const message = chatInput.value.trim();
+      if (message) {
+        // Rate limiting check
+        if (!checkRateLimit(userId, 10, 60000)) { // 10 pesan per menit
+          showAlert('warning', 'Terlalu banyak pesan. Silakan tunggu sebentar.');
+          return;
+        }
+        
+        addMessage(sanitizeInput(message), 'user');
+        chatInput.value = '';
+      }
+    });
+    
+    // Send message when Enter key is pressed
+    chatInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const message = chatInput.value.trim();
+        if (message) {
+          // Rate limiting check
+          if (!checkRateLimit(userId, 10, 60000)) {
+            showAlert('warning', 'Terlalu banyak pesan. Silakan tunggu sebentar.');
+            return;
+          }
+          
+          addMessage(sanitizeInput(message), 'user');
+          chatInput.value = '';
+        }
+      }
+    });
+    
+    // Typing indicator
+    chatInput.addEventListener('input', () => {
+      if (!isTyping) {
+        isTyping = true;
+        // Dalam implementasi nyata, ini akan mengirim status typing ke server
+      }
+      
+      clearTimeout(typingTimer);
+      typingTimer = setTimeout(() => {
+        isTyping = false;
+        // Dalam implementasi nyata, ini akan mengirim status berhenti mengetik ke server
+      }, 1000);
+    });
+    
+    // Refresh chat history
+    refreshChatBtn.addEventListener('click', () => {
+      loadChatHistory();
+      showAlert('info', 'Memuat ulang percakapan...');
+      
+      // Track event
+      trackEvent('chat', 'refresh', 'user_initiated');
+    });
+    
+    // Clear chat history
+    clearChatBtn.addEventListener('click', () => {
+      clearChatHistory();
+    });
+    
+    // Export chat history
+    exportChatBtn.addEventListener('click', () => {
+      exportChatHistory();
+    });
+    
+    // File upload
+    fileUploadBtn.addEventListener('click', () => {
+      fileInput.click();
+    });
+    
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleFileUpload(e.target.files[0]);
+        // Reset input file
+        e.target.value = '';
+      }
+    });
+    
+    // Drag and drop untuk file
+    chatInputArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      chatInputArea.classList.add('drag-over');
+    });
+    
+    chatInputArea.addEventListener('dragleave', () => {
+      chatInputArea.classList.remove('drag-over');
+    });
+    
+    chatInputArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      chatInputArea.classList.remove('drag-over');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleFileUpload(files[0]);
+      }
+    });
+    
+    // =============================================
+    // OFFLINE/ONLINE EVENT LISTENERS
+    // =============================================
+    
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    
+    // =============================================
+    // KEYBOARD NAVIGATION
+    // =============================================
+    
+    document.addEventListener('keydown', (e) => {
+      // ESC untuk menutup modal/menu
+      if (e.key === 'Escape') {
+        mobilePlusBtn.classList.remove('active');
+        mobileMenuCards.classList.remove('active');
+      }
+      
+      // Tab navigation untuk form
+      if (e.key === 'Tab' && e.target.classList.contains('form-control')) {
+        const formControls = document.querySelectorAll('.form-control');
+        const currentIndex = Array.from(formControls).indexOf(e.target);
+        
+        if (e.shiftKey && currentIndex === 0) {
+          e.preventDefault();
+          formControls[formControls.length - 1].focus();
+        } else if (!e.shiftKey && currentIndex === formControls.length - 1) {
+          e.preventDefault();
+          formControls[0].focus();
+        }
+      }
+    });
+    
+    // PARTIKEL GALAXY
+    const canvas = document.getElementById('galaxy');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function getParticleCount() {
+      const w = window.innerWidth;
+      if (w <= 576) return 60;
+      if (w <= 768) return 100;
+      if (w <= 992) return 150;
+      if (w <= 1200) return 200;
+      if (w <= 1600) return 250;
+      return 300;
+    }
+
+    function initParticles() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      particles = [];
+      for (let i = 0; i < getParticleCount(); i++) particles.push(new Particle());
+    }
+
+    class Particle {
+      constructor() { this.reset(); }
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2.5 + 0.5;
+        this.speedX = Math.random() * 0.8 - 0.4;
+        this.speedY = Math.random() * 0.8 - 0.4;
+        this.opacity = Math.random() * 0.7 + 0.3;
+      }
+      update() {
+        this.x += this.speedX; this.y += this.speedY;
+        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+      }
+      draw() {
+        ctx.fillStyle = `rgba(0, 243, 255, ${this.opacity})`;
+        ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+
+    function animate() {
+      ctx.fillStyle = 'rgba(10, 10, 42, 0.06)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => { p.update(); p.draw(); });
+      requestAnimationFrame(animate);
+    }
+
+    // Initialize on load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        animateOnScroll();
+      }, 500);
+    });
+
+    window.addEventListener('resize', initParticles);
+    
+    initParticles(); 
+    animate();
+  </script>
+</body>
+</html>
